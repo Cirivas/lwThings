@@ -17,7 +17,9 @@
   },
   "homepage": "https://github.com/Cirivas/lwThings#readme",
   "dependencies": {
+    "body-parser": "^1.15.2",
     "cors": "^2.7.1",
-    "express": "^4.14.0"
+    "express": "^4.14.0",
+    "zerorpc": "^0.9.6"
   }
 }

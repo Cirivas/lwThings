@@ -14,8 +14,6 @@ app.use(cors());
 app.use(bodyParser.urlencoded({ extended: false}));
 app.use(bodyParser.json());
 
-
-
 router.post('/pet/:text', function(req, res){
 	console.log("Lamatizacion de " + req.params.text);
 	client.invoke("lemma",req.params.text, function(err, resp, more){

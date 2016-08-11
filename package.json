@@ -1,0 +1,23 @@
+{
+  "name": "servidor",
+  "version": "1.0.0",
+  "description": "test server ",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/Cirivas/lwThings.git"
+  },
+  "author": "CRivas",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Cirivas/lwThings/issues"
+  },
+  "homepage": "https://github.com/Cirivas/lwThings#readme",
+  "dependencies": {
+    "cors": "^2.7.1",
+    "express": "^4.14.0"
+  }
+}

@@ -15,8 +15,7 @@ class Lemmatizer(object):
 			if os.path.exists(os.getcwd() + '\\vids\\' + word + '.mp4'):
 				final.append(word)
 			else:
-				for letter in list(word):
-					final.append(letter)
+				final.extend(word)
 		return final
 
 

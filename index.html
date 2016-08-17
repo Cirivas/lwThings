@@ -1,0 +1,445 @@
+
+<!DOCTYPE html>
+<meta charset="utf-8">
+<title>Web Speech API Demo</title>
+<style>
+  * {
+    font-family: Verdana, Arial, sans-serif;
+  }
+  a:link {
+    color:#000;
+    º-decoration: none;
+  }
+  a:visited {
+    color:#000;
+  }
+  a:hover {
+    color:#33F;
+  }
+  .button {
+    background: -webkit-linear-gradient(top,#008dfd 0,#0370ea 100%);
+    border: 1px solid #076bd2;
+    border-radius: 3px;
+    color: #fff;
+    display: none;
+    font-size: 13px;
+    font-weight: bold;
+    line-height: 1.3;
+    padding: 8px 25px;
+    text-align: center;
+    text-shadow: 1px 1px 1px #076bd2;
+    letter-spacing: normal;
+  }
+  .center {
+    padding: 10px;
+    text-align: center;
+  }
+  .final {
+    color: black;
+    padding-right: 3px; 
+  }
+  .interim {
+    color: gray;
+  }
+  .info {
+    font-size: 14px;
+    text-align: center;
+    color: #777;
+    display: none;
+  }
+  .right {
+    float: right;
+  }
+  .sidebyside {
+    display: inline-block;
+    width: 45%;
+    min-height: 40px;
+    text-align: left;
+    vertical-align: top;
+  }
+  #headline {
+    font-size: 40px;
+    font-weight: 300;
+  }
+  #info {
+    font-size: 20px;
+    text-align: center;
+    color: #777;
+    visibility: hidden;
+  }
+  #results {
+    font-size: 14px;
+    font-weight: bold;
+    border: 1px solid #ddd;
+    padding: 15px;
+    text-align: left;
+    min-height: 150px;
+  }
+</style>
+<h1 class="center" id="headline">
+	Demostración WebSpeech
+</h1>
+<div id="info">
+  <p id="info_start">Click en comenzar para iniciar la grabación.</p>
+  <p id="info_speak_now">Escuchando...</p>
+  <p id="info_no_speech">No se detectó habla</p>
+  <p id="info_no_microphone" style="display:none"> No se encontró micrófono </p>
+  <p id="info_allow">Click en "Permitir" para usar el micrófono.</p>
+  <p id="info_denied">Permiso para utilizar el micrófono fue denegado.</p>
+  <p id="info_blocked">El micrófono está bloqueado, puede cambiarlo en chrome://settings/contentExceptions#media-stream</p>
+  <p id="info_upgrade">Web Speech API is not supported by this browser.
+     Upgrade to <a href="//www.google.com/chrome">Chrome</a>
+     version 25 or later.</p>
+</div>
+<div id="results">
+  <span id="final_span" class="final"></span>
+  <span id="interim_span" class="interim"></span>
+  <p>
+</div>
+<div class="center">
+	 <button id="start_button" onclick="startButton(event)">
+    Comenzar</button>
+  <div id="div_language">
+    <select id="select_language" onchange="updateCountry()"></select>
+    &nbsp;&nbsp;
+    <select id="select_dialect"></select>
+  </div>
+</div>
+<div class="center">
+	<div id="texto">
+</div>
+<div class="center">
+	<video style="z-index:1" id="signVideo" width="288" height="192" preload="auto" autoplay />
+</div>
+</object>
+<script>
+	var langs =
+	[['Afrikaans',       ['af-ZA']],
+	 ['Bahasa Indonesia',['id-ID']],
+	 ['Bahasa Melayu',   ['ms-MY']],
+	 ['Català',          ['ca-ES']],
+	 ['Čeština',         ['cs-CZ']],
+	 ['Deutsch',         ['de-DE']],
+	 ['English',         ['en-AU', 'Australia'],
+	                     ['en-CA', 'Canada'],
+	                     ['en-IN', 'India'],
+	                     ['en-NZ', 'New Zealand'],
+	                     ['en-ZA', 'South Africa'],
+	                     ['en-GB', 'United Kingdom'],
+	                     ['en-US', 'United States']],
+	 ['Español',         ['es-AR', 'Argentina'],
+	                     ['es-BO', 'Bolivia'],
+	                     ['es-CL', 'Chile'],
+	                     ['es-CO', 'Colombia'],
+	                     ['es-CR', 'Costa Rica'],
+	                     ['es-EC', 'Ecuador'],
+	                     ['es-SV', 'El Salvador'],
+	                     ['es-ES', 'España'],
+	                     ['es-US', 'Estados Unidos'],
+	                     ['es-GT', 'Guatemala'],
+	                     ['es-HN', 'Honduras'],
+	                     ['es-MX', 'México'],
+	                     ['es-NI', 'Nicaragua'],
+	                     ['es-PA', 'Panamá'],
+	                     ['es-PY', 'Paraguay'],
+	                     ['es-PE', 'Perú'],
+	                     ['es-PR', 'Puerto Rico'],
+	                     ['es-DO', 'República Dominicana'],
+	                     ['es-UY', 'Uruguay'],
+	                     ['es-VE', 'Venezuela']],
+	 ['Euskara',         ['eu-ES']],
+	 ['Français',        ['fr-FR']],
+	 ['Galego',          ['gl-ES']],
+	 ['Hrvatski',        ['hr_HR']],
+	 ['IsiZulu',         ['zu-ZA']],
+	 ['Íslenska',        ['is-IS']],
+	 ['Italiano',        ['it-IT', 'Italia'],
+	                     ['it-CH', 'Svizzera']],
+	 ['Magyar',          ['hu-HU']],
+	 ['Nederlands',      ['nl-NL']],
+	 ['Norsk bokmål',    ['nb-NO']],
+	 ['Polski',          ['pl-PL']],
+	 ['Português',       ['pt-BR', 'Brasil'],
+	                     ['pt-PT', 'Portugal']],
+	 ['Română',          ['ro-RO']],
+	 ['Slovenčina',      ['sk-SK']],
+	 ['Suomi',           ['fi-FI']],
+	 ['Svenska',         ['sv-SE']],
+	 ['Türkçe',          ['tr-TR']],
+	 ['български',       ['bg-BG']],
+	 ['Pусский',         ['ru-RU']],
+	 ['Српски',          ['sr-RS']],
+	 ['한국어',            ['ko-KR']],
+	 ['中文',             ['cmn-Hans-CN', '普通话 (中国大陆)'],
+	                     ['cmn-Hans-HK', '普通话 (香港)'],
+	                     ['cmn-Hant-TW', '中文 (台灣)'],
+	                     ['yue-Hant-HK', '粵語 (香港)']],
+	 ['日本語',           ['ja-JP']],
+	 ['Lingua latīna',   ['la']]];
+	for (var i = 0; i < langs.length; i++) {
+		select_language.options[i] = new Option(langs[i][0], i);
+	}
+	select_language.selectedIndex = 7;
+	updateCountry();
+	select_dialect.selectedIndex = 2;
+	showInfo('info_start');
+	function updateCountry() {
+		for (var i = select_dialect.options.length - 1; i >= 0; i--) {
+	    	select_dialect.remove(i);
+	  	}
+	  	var list = langs[select_language.selectedIndex];
+	  	for (var i = 1; i < list.length; i++) {
+			select_dialect.options.add(new Option(list[i][1], list[i][0]));
+		}
+	  	select_dialect.style.visibility = list[1].length == 1 ? 'hidden' : 'visible';
+	}
+	var create_email = false;
+	var final_transcript = '';
+	var recognizing = false;
+	var ignore_onend;
+	var start_timestamp;
+
+	//Video vars
+	var letters;
+	var words;
+	var lettersIndex = 0;
+	var wordsIndex = 0;
+	var wordSpelling = false;
+
+	if (!('webkitSpeechRecognition' in window)) {
+		upgrade();
+	} else {
+	  	var recognition = new webkitSpeechRecognition();
+	  	recognition.continuous = true;
+	  	recognition.interimResults = true;
+	  	recognition.onstart = function() {
+		    recognizing = true;
+		    showInfo('info_speak_now');
+	  	};
+	  	recognition.onerror = function(event) {
+		    if (event.error == 'no-speech') {
+		    	showInfo('info_no_speech');
+		    	ignore_onend = true;
+		    }
+		    if (event.error == 'audio-capture') {
+		     	showInfo('info_no_microphone');
+		    	ignore_onend = true;
+		    }
+		    if (event.error == 'not-allowed') {
+		    	if (event.timeStamp - start_timestamp < 100) {
+		        	showInfo('info_blocked');
+		      	} else {
+		        	showInfo('info_denied');
+		      	}
+		      	ignore_onend = true;
+		    }
+		};
+	  	recognition.onend = function() {
+	    	recognizing = false;
+	    	start_button.innerHTML = "Comenzar";
+	    	if (ignore_onend) {
+	      		return;
+	    	}
+	    	if (!final_transcript) {
+	      		showInfo('info_start');
+	      	return;
+	    	}
+	    	showInfo('');
+	    	if (window.getSelection) {
+	      		window.getSelection().removeAllRanges();
+	      		var range = document.createRange();
+	      		range.selectNode(document.getElementById('final_span'));
+	      		window.getSelection().addRange(range);
+	    	}
+	    	if (create_email) {
+	      		create_email = false;
+	      		createEmail();
+	    	}
+	  	};
+	  	recognition.onresult = function(event) {
+	    	var interim_transcript = '';
+	    	for (var i = event.resultIndex; i < event.results.length; ++i) {
+	      		if (event.results[i].isFinal) {
+	        		final_transcript += event.results[i][0].transcript;
+	        		console.log(event.results[i][0].transcript);
+	        		generateWords(final_transcript);
+	      		} else {
+	        		interim_transcript += event.results[i][0].transcript;
+	      		}
+	    	}
+	    	final_transcript = capitalize(final_transcript);
+	    	final_span.innerHTML = linebreak(final_transcript);
+	    	interim_span.innerHTML = linebreak(interim_transcript);
+	    	//texto.innerHTML = final_transcript;
+	    	//generateWords(final_transcript);
+	  
+	    	if (final_transcript || interim_transcript) {
+	      		showButtons('inline-block');
+	    	}
+		};
+	}
+	function upgrade() {
+		start_button.style.visibility = 'hidden';
+	  	showInfo('info_upgrade');
+	}
+	var two_line = /\n\n/g;
+	var one_line = /\n/g;
+	function linebreak(s) {
+		return s.replace(two_line, '<p></p>').replace(one_line, '<br>');
+	}
+	var first_char = /\S/;
+	function capitalize(s) {
+	  	return s.replace(first_char, function(m) { return m.toUpperCase(); });
+	}
+
+	function startButton(event) {
+	  	if (recognizing) {
+	    	recognition.stop();
+	    	return;
+	  	}
+	  	lettersIndex = 0;
+	  	wordsIndex = 0;
+	  	final_transcript = '';
+	  	recognition.lang = select_dialect.value;
+	  	recognition.start();
+	  	ignore_onend = false;
+	  	final_span.innerHTML = '';
+	  	interim_span.innerHTML = '';
+	  	start_button.innerHTML = "Detener";
+	  	showInfo('info_allow');
+	  	showButtons('none');
+	  	start_timestamp = event.timeStamp;
+	  	//lemmatize("Ellos son muy felices");
+	}
+	function showInfo(s) {
+	  	if (s) {
+	    	for (var child = info.firstChild; child; child = child.nextSibling) {
+	      		if (child.style) {
+	        		child.style.display = child.id == s ? 'inline' : 'none';
+	      		}
+	    	}
+	    	info.style.visibility = 'visible';
+	  	} else {
+	    	info.style.visibility = 'hidden';
+	  	}
+	}
+	var current_style;
+	function showButtons(style) {
+	  	if (style == current_style) {
+	    	return;
+	  	}
+	  	current_style = style;
+	}
+
+	// video related
+
+	//Generates the letters' array and show the first letter's video
+	function generateWords(text){
+		texto.innerHTML = text;
+		words = lemmatize(text);
+		/*
+		console.log("ADsdsd?");
+		//Clean text. Remove accents and spaces.
+		woAccents = text;
+		woAccents = woAccents.replace(/á/gi, "a");
+		woAccents = woAccents.replace(/é/gi, "e");
+		woAccents = woAccents.replace(/í/gi, "i");
+		woAccents = woAccents.replace(/ó/gi, "o");
+		woAccents = woAccents.replace(/ú/gi, "u");
+		woAccents = woAccents.replace(/ñ/gi, "n");
+		
+		console.log("El arreglo es")
+		console.log(JSON.parse(woAccents));*/
+		//All to uppercase, then generate the letter's array
+		//words = woAccents.toUpperCase(); //.split(" ");
+		
+		console.log(words);
+		//Show the first word's or letter's video.
+		if(words.length > 0 && words[0] != ""){
+			//Find word
+			if(words[wordsIndex].length > 1) {
+				url = "palabras/" + words[wordsIndex] + ".mp4";
+				if(UrlExists(url)){
+					console.log("Word " + words[wordsIndex]);
+					signVideo.src = url;
+					signVideo.load();
+					wordsIndex++;
+				} else {
+					//Word doesnt exist, must spell it.
+					letters = words[wordsIndex].split("");
+					console.log("Spelling first letter of " + words[wordsIndex]);
+					lettersIndex = 0;
+					wordSpelling = true;
+					signVideo.src = "letras/" + letters[lettersIndex] + ".mp4";
+					lettersIndex++;
+					signVideo.load();
+				}			
+			} else {
+				//It's just a letter (e.g. 'a', 'e', 'y')
+				console.log("Spelling letter " + words[wordsIndex]);
+				signVideo.src = "letras/" + words[wordsIndex] + ".mp4";
+				wordsIndex++;
+				signVideo.load();
+			}	
+		}
+	}
+
+	signVideo.onended = function() {
+		if(wordSpelling){
+			//Continue with word spelling
+			signVideo.src = "letras/" + letters[lettersIndex] + ".mp4";
+			signVideo.load();
+			lettersIndex++;	
+			if(lettersIndex == letters.length) {
+				wordSpelling = false;
+				console.log("finished spelling of " + words[wordsIndex])
+				//Continue with next word.
+				wordsIndex++;
+			}
+		} else {
+			if(words[wordsIndex].length > 1) {
+				url = "palabras/" + words[wordsIndex] + ".mp4";
+				if(UrlExists(url)){
+					signVideo.src = url;
+					signVideo.load();
+					wordsIndex++;
+					if(wordsIndex == words.length) return;
+				} else {
+					//Word doenst exist, must spell it.
+					if(wordsIndex == words.length) return;
+					console.log("Spelling new first letter");
+					letters = words[wordsIndex].split("");
+					lettersIndex = 0;
+					wordSpelling = true;
+					signVideo.src = "letras/" + letters[lettersIndex] + ".mp4";
+					lettersIndex++;
+					signVideo.load();
+				}
+			} else {
+				//It's just a letter (e.g. 'ir ->a<-', 'alta ->e<- inmensa', 'y')
+				console.log("Spelling letter " + words[wordsIndex]);
+				signVideo.src = "letras/" + words[wordsIndex] + ".mp4";
+				wordsIndex++;
+				signVideo.load();
+			}	
+		}
+	}
+
+	//Check is url is valid (Used to find a specific word's video)
+	function UrlExists(url) {
+	    var http = new XMLHttpRequest();
+	    http.open('HEAD', url, false);
+	    http.send();
+	    return http.status!=404;
+	}
+	
+
+	function lemmatize(text){
+		var http = new XMLHttpRequest();
+		var params = 'text='+text;
+		http.open('POST','http://localhost:8080/pet/', false);
+		http.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+		http.send(params);		
+		return JSON.parse(http.response);
+	}
+</script>

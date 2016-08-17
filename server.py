@@ -8,8 +8,12 @@ import os
 class Lemmatizer(object):
 	def lemma(self, text):
 		print "Lemmatizacion de", text
+
+		#Get lemmas of the phrase
 		string = pes.parse(text, lemmata=True)
 		words = [w[-1] for w in string.split()[0]]
+
+		#Get videos of words. If the word doesnt have a video, add each letter as word
 		final = []
 		for word in words:
 			if os.path.exists(os.getcwd() + '\\vids\\' + word + '.mp4'):

@@ -199,13 +199,6 @@
 	var ignore_onend;
 	var start_timestamp;
 
-	//Video vars
-	var letters;
-	var words;
-	var lettersIndex = 0;
-	var wordsIndex = 0;
-	var wordSpelling = false;
-
 	if (!('webkitSpeechRecognition' in window)) {
 		upgrade();
 	} else {
@@ -329,7 +322,9 @@
 	}
 
 	// video related
-
+	//Video vars
+	var words;
+	var wordsIndex = 0;
 	//Generates the letters' array and show the first video
 	function generateWords(text){
 		words = wordsAndLetters(text);

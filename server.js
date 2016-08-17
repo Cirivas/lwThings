@@ -30,6 +30,12 @@ router.get('/', function(req, res){
 	res.sendFile(path.join(__dirname+'/index.html'));
 });
 
+//Serve videos
+//To DO - serve all videos in just one folder
+router.get('/vids/:video', function(req, res){
+	res.sendFile(path.join(__dirname+'/vids/'+req.params.video));
+});
+
 app.use(router);
 app.listen(8080, function(){
 	console.log("Example app");

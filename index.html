@@ -261,8 +261,8 @@
 	    	for (var i = event.resultIndex; i < event.results.length; ++i) {
 	      		if (event.results[i].isFinal) {
 	        		final_transcript += event.results[i][0].transcript;
-	        		console.log(event.results[i][0].transcript);
-	        		generateWords(final_transcript);
+	        		texto.innerHTML = final_transcript;
+	        		generateWords(event.results[i][0].transcript);
 	      		} else {
 	        		interim_transcript += event.results[i][0].transcript;
 	      		}
@@ -270,8 +270,6 @@
 	    	final_transcript = capitalize(final_transcript);
 	    	final_span.innerHTML = linebreak(final_transcript);
 	    	interim_span.innerHTML = linebreak(interim_transcript);
-	    	//texto.innerHTML = final_transcript;
-	    	//generateWords(final_transcript);
 	  
 	    	if (final_transcript || interim_transcript) {
 	      		showButtons('inline-block');
@@ -308,8 +306,7 @@
 	  	start_button.innerHTML = "Detener";
 	  	showInfo('info_allow');
 	  	showButtons('none');
-	  	start_timestamp = event.timeStamp;
-	  	//lemmatize("Ellos son muy felices");
+	  	start_timestamp = event.timeStamp;	 
 	}
 	function showInfo(s) {
 	  	if (s) {
@@ -333,108 +330,25 @@
 
 	// video related
 
-	//Generates the letters' array and show the first letter's video
+	//Generates the letters' array and show the first video
 	function generateWords(text){
-		texto.innerHTML = text;
-		words = lemmatize(text);
-		/*
-		console.log("ADsdsd?");
-		//Clean text. Remove accents and spaces.
-		woAccents = text;
-		woAccents = woAccents.replace(/á/gi, "a");
-		woAccents = woAccents.replace(/é/gi, "e");
-		woAccents = woAccents.replace(/í/gi, "i");
-		woAccents = woAccents.replace(/ó/gi, "o");
-		woAccents = woAccents.replace(/ú/gi, "u");
-		woAccents = woAccents.replace(/ñ/gi, "n");
-		
-		console.log("El arreglo es")
-		console.log(JSON.parse(woAccents));*/
-		//All to uppercase, then generate the letter's array
-		//words = woAccents.toUpperCase(); //.split(" ");
-		
-		console.log(words);
-		//Show the first word's or letter's video.
-		if(words.length > 0 && words[0] != ""){
-			//Find word
-			if(words[wordsIndex].length > 1) {
-				url = "palabras/" + words[wordsIndex] + ".mp4";
-				if(UrlExists(url)){
-					console.log("Word " + words[wordsIndex]);
-					signVideo.src = url;
-					signVideo.load();
-					wordsIndex++;
-				} else {
-					//Word doesnt exist, must spell it.
-					letters = words[wordsIndex].split("");
-					console.log("Spelling first letter of " + words[wordsIndex]);
-					lettersIndex = 0;
-					wordSpelling = true;
-					signVideo.src = "letras/" + letters[lettersIndex] + ".mp4";
-					lettersIndex++;
-					signVideo.load();
-				}			
-			} else {
-				//It's just a letter (e.g. 'a', 'e', 'y')
-				console.log("Spelling letter " + words[wordsIndex]);
-				signVideo.src = "letras/" + words[wordsIndex] + ".mp4";
-				wordsIndex++;
-				signVideo.load();
-			}	
-		}
+		words = wordsAndLetters(text);
+		wordsIndex = 0;
+		signVideo.src = "/vids/"+words[wordsIndex]+".mp4";
+		signVideo.load();
+		wordsIndex++;
 	}
 
 	signVideo.onended = function() {
-		if(wordSpelling){
-			//Continue with word spelling
-			signVideo.src = "letras/" + letters[lettersIndex] + ".mp4";
+		if(wordsIndex < words.length) {
+			signVideo.src = "/vids/"+words[wordsIndex]+".mp4";
 			signVideo.load();
-			lettersIndex++;	
-			if(lettersIndex == letters.length) {
-				wordSpelling = false;
-				console.log("finished spelling of " + words[wordsIndex])
-				//Continue with next word.
-				wordsIndex++;
-			}
-		} else {
-			if(words[wordsIndex].length > 1) {
-				url = "palabras/" + words[wordsIndex] + ".mp4";
-				if(UrlExists(url)){
-					signVideo.src = url;
-					signVideo.load();
-					wordsIndex++;
-					if(wordsIndex == words.length) return;
-				} else {
-					//Word doenst exist, must spell it.
-					if(wordsIndex == words.length) return;
-					console.log("Spelling new first letter");
-					letters = words[wordsIndex].split("");
-					lettersIndex = 0;
-					wordSpelling = true;
-					signVideo.src = "letras/" + letters[lettersIndex] + ".mp4";
-					lettersIndex++;
-					signVideo.load();
-				}
-			} else {
-				//It's just a letter (e.g. 'ir ->a<-', 'alta ->e<- inmensa', 'y')
-				console.log("Spelling letter " + words[wordsIndex]);
-				signVideo.src = "letras/" + words[wordsIndex] + ".mp4";
-				wordsIndex++;
-				signVideo.load();
-			}	
+			wordsIndex++;
 		}
 	}
 
-	//Check is url is valid (Used to find a specific word's video)
-	function UrlExists(url) {
-	    var http = new XMLHttpRequest();
-	    http.open('HEAD', url, false);
-	    http.send();
-	    return http.status!=404;
-	}
-	
-
-	function lemmatize(text){
+	//Get the words or to spell.
+	function wordsAndLetters(text){
 		var http = new XMLHttpRequest();
 		var params = 'text='+text;
 		http.open('POST','http://localhost:8080/pet/', false);

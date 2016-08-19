@@ -106,10 +106,14 @@
   </div>
 </div>
 <div class="center">
-	<div id="texto">
+	<div id="texto"></div>
 </div>
 <div class="center">
 	<video style="z-index:1" id="signVideo" width="288" height="192" preload="auto" autoplay />
+</div>
+<div class="center">
+	<button onclick="test()">Test</button>
+	<div id="text"></div>
 </div>
 </object>
 <script>
@@ -288,7 +292,6 @@
 	    	recognition.stop();
 	    	return;
 	  	}
-	  	lettersIndex = 0;
 	  	wordsIndex = 0;
 	  	final_transcript = '';
 	  	recognition.lang = select_dialect.value;
@@ -351,4 +354,13 @@
 		http.send(params);		
 		return JSON.parse(http.response);
 	}
+
+	function test(){
+		var http = new XMLHttpRequest();
+		var params = 'texto=Acercándosele muy lentamente&result=1&lingua=es&tagger=freeling&output=conll'
+		http.open('POST', 'http://gramatica.usc.es/~gamallo/php/deppattern/index.php', false);
+		http.setRequestHeader("Content-type", "multipart/form-data");
+		http.send(params)
+		text.innerHTML = http.response;
+	}	
 </script>

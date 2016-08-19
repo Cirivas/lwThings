@@ -31,7 +31,6 @@ router.get('/', function(req, res){
 });
 
 //Serve videos
-//To DO - serve all videos in just one folder
 router.get('/vids/:video', function(req, res){
 	res.sendFile(path.join(__dirname+'/vids/'+req.params.video));
 });

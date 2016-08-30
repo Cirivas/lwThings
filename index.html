@@ -82,7 +82,7 @@
 <div id="info">
   <p id="info_start">Click en comenzar para iniciar la grabación.</p>
   <p id="info_speak_now">Escuchando...</p>
-  <p id="info_no_speech">No se detectó habla</p>
+  <p id="info_no_speech">No se detectó habla <a href="//support.google.com/chrome/bin/answer.py?hl=en&amp;answer=1407892">Aqui</a></p>
   <p id="info_no_microphone" style="display:none"> No se encontró micrófono </p>
   <p id="info_allow">Click en "Permitir" para usar el micrófono.</p>
   <p id="info_denied">Permiso para utilizar el micrófono fue denegado.</p>
@@ -110,10 +110,6 @@
 </div>
 <div class="center">
 	<video style="z-index:1" id="signVideo" width="288" height="192" preload="auto" autoplay />
-</div>
-<div class="center">
-	<button onclick="test()">Test</button>
-	<div id="text"></div>
 </div>
 </object>
 <script>
@@ -354,13 +350,4 @@
 		http.send(params);		
 		return JSON.parse(http.response);
 	}
-
-	function test(){
-		var http = new XMLHttpRequest();
-		var params = 'texto=Acercándosele muy lentamente&result=1&lingua=es&tagger=freeling&output=conll'
-		http.open('POST', 'http://gramatica.usc.es/~gamallo/php/deppattern/index.php', false);
-		http.setRequestHeader("Content-type", "multipart/form-data");
-		http.send(params)
-		text.innerHTML = http.response;
-	}	
 </script>

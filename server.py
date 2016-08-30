@@ -6,6 +6,7 @@ import os
 
 '''
 Notas:
+Link Freeling analyzer tags: https://talp-upc.gitbooks.io/freeling-user-manual/content/tagsets/tagset-es.html
 
 - Resolver qué hacer con palabras que se escriben igual pero tienen distinto significado. 
 - Marcar palabras que representan a hombre y mujer (esposo-esposa, tío-tía, él-ella, etc) => hay que listar todas las posibilidades. 
@@ -217,7 +218,7 @@ print "Corriendo"
 s.run()
 
 '''
-strTest = "dijo que no cantaba muy bien"
+strTest = "la helada"
 
 '''
 string = pes.parse(strTest, relations=True, lemmata=True)

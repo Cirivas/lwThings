@@ -49,7 +49,7 @@ class Lemmatizer(object):
 		return final
 	def lemma(self, text):
 		print "Lematizacion de", text
-
+		
 		#Create file
 		meh = open("meh", "w")
 		meh.write(text)
@@ -62,8 +62,7 @@ class Lemmatizer(object):
 		words = freelingParser(stream)
 
 		final = []
-		for word in words:
-			
+		for word in words:			
 			if os.path.exists(os.getcwd() + '/vids/' + word + '.mp4'):
 				final.append(word)
 			else:
@@ -130,16 +129,15 @@ def freelingParser(frobject):
 	final = []
 
 	#this variable helps to identify a participe verb used as a noun (el helado), so we do not add the lemma (helar).
-	flagDet = False
+	flagArt = False
 
 	verb = ''
 	question = ''
 	pronoun = ''
 
-	i = 0
 	subjectPos = 0
 	questionMarks = ['qué', 'cómo']
-	femeninWords = ['ella', 'esposa', 'tía']
+	femeninWords = ['ella', 'esposa', 'tía', 'prima', 'hermana', 'cuñada', 'nuera', 'niña']
 
 	pronouns = ["yo", "tú", "usted", "él","ella", "nosotros", "vosotros", "ustedes", "ellos", "ellas"]
 	pronounsDict = { "1S": "yo", "2S": "tú", "3S": "él",
@@ -147,61 +145,81 @@ def freelingParser(frobject):
 
 	tenses ={"I":"(imperfecto)", "F":"(futuro)","S":"(pasado)","C":"(condicional)"}
 	for line in frobject:
+		'''
+		Line structure
+		- word: from the speech
+		- lemma: lemma of the word (e.g. cantó => cantar, dulces => dulce)
+		- tags: depends on the word. Show if a word is a Noun, Verb, Adverb, etc, and characteristics of them. E.g. a Verb has a tense, mood, person, singular or plural, etc.
+		- prob: the probability of the lemma to be correct. 
+		'''
 		print line.strip()
 		line = line.strip().split(' ')
+		
 		if len(line) < 2:
 			continue
-		elif line[1] == 'el':
-			flagDet = True
+		elif line[1] in ['el', 'un']:
+			flagArt = True
 			continue
 		elif line[1] == 'ser':
+			flagArt = False
 			continue
 		elif line[1] == 'que':
-			final.append(verb)
+			flagArt = False
+			#If 'que' goes after a verb, we add the stored verb, since it is not the main verb.
+			if verb != '':
+				final.append(verb)
+			#
 			continue
-		elif line[1] in '¿?':
+		elif line[1] in '¿?.,':
+			flagArt = False
 			continue
-		else:
-			if flagDet and line[2][0] == 'V':
-				#if an article was removed, and the current word is a identified as a verb, it is really a noun, so we do not add the lemma.
-				#e.g. 'el helado', 'el dado'.
-				final.append(line[0])
-				flagDet = False
-			elif line[0] in questionMarks:
-				#store question word to put it at the end
-				question = line[0]
 
-			elif line[0] in femeninWords:
-				#Words like "ella", "esposa" have a masculine lema, but we need to keep it in femenine
-				final.append(line[0])
+		elif flagArt and line[2][0] == 'V':
+			#if an article was removed, and the current word is a identified as a verb, it is really a noun, so we do not add the lemma.
+			#e.g. 'el helado', 'el dado'.
+			final.append(line[0])
+			flagArt = False
+		elif line[0] in questionMarks:
+			flagArt = False
+			#store question word to put it at the end
+			question = line[0]
 
-			elif line[2][0] == 'V' and line[2][2] != 'N':
-				#store verb to put it at the end			
-				verb = line[1]
+		elif line[0] in femeninWords:
+			flagArt = False
+			#Words like "ella", "esposa" have a masculine lema, but we need to keep it in femenine
+			final.append(line[0])
 
-				#identify subject and tense
-				#TODO: 2 verbal times, 2 subjects
-				if line[2][3] != 'P':
-					final.insert(0, tenses[line[2][3]])
-					subjectPos += 1
-
-				flag = False
-				for p in pronouns:
-					if p in final[subjectPos+1:]:
-						print final, subjectPos, p
-						flag = True
-						subjectPos = final.index(p)
-						
-
-				if flag:
-					continue
-				else:
-					final.append(pronounsDict[line[2][4:6]])
-					print final
+		elif line[2][0] == 'V' and line[2][2] != 'N':
+			flagArt = False
+			#store verb to put it at the end
+			#if there is already a verb, put it in the array since it is not the main verb.
+			if verb != '':
+				final.append(verb)
+				subjectPos+=1
 			
+			verb = line[1]
+			
+			#identify subject and tense
+			#TODO: 2 verbal times
+			if line[2][3] != 'P':
+				final.insert(0, tenses[line[2][3]])
+				subjectPos += 1
+
+			#Look if there is a subject in the sentense 
+			flag = False
+			for p in pronouns:
+				if p in final[subjectPos+1:]:
+					flag = True
+					subjectPos = final.index(p)
+
+			if flag:
+				continue
 			else:
-				final.append(line[1])
-		i = len(final)
+				final.append(pronounsDict[line[2][4:6]])
+		
+		else:
+			flagArt = False
+			final.append(line[1])
 	#Add verb and question mark (if any)
 	final.append(verb)
 
@@ -218,7 +236,7 @@ print "Corriendo"
 s.run()
 
 '''
-strTest = "la helada"
+strTest = "el hermano de la niña que cantaba está bien"
 
 '''
 string = pes.parse(strTest, relations=True, lemmata=True)
@@ -235,14 +253,14 @@ meh.close()
 stream = os.popen("analyze -f es.cfg  < meh")
 
 #stream2 = os.popen("analyze -f es.cfg --output conll < meh")
-
+skip = ["(pasado)", "(futuro)", "(condicional)", "(imperfecto)"]
 words = freelingParser(stream)
 final = []
 for word in words:
-	if os.path.exists(os.getcwd() + '/vids/' + word + '.mp4'):
+	if word in skip:
+		continue
+	elif os.path.exists(os.getcwd() + '/vids/' + word + '.mp4'):
 		final.append(word)
 	else:	
 		final.extend(word)
 print final
-
-

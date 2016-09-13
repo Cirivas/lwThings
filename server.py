@@ -134,7 +134,8 @@ def freelingParser(frobject):
 	#this variable helps to identify a participe verb used as a noun (el helado), so we do not add the lemma (helar).
 	flagArt = False
 	flagDe = False 
-	flagSubject = False 
+	flagSubject = False
+	flagNegative = False
 	verb = ''
 	question = ''
 	pronoun = ''
@@ -175,12 +176,18 @@ def freelingParser(frobject):
 		elif line[1] in ['el', 'un', 'uno']:
 			flagArt = True
 			continue
+
+		elif line[1] == 'no':
+			flagNegative = True
+			continue
+
 		elif line[1] == 'ser':
 			if line[2][3] != 'P':
 				final.insert(0, tenses[line[2][3]])
 				subjectPos += 1
 			flagArt = False
 			continue
+
 		elif line[1] == 'que':
 			flagArt = False
 			#If 'que' goes after a verb, we add the stored verb, since it is not the main verb.
@@ -188,8 +195,11 @@ def freelingParser(frobject):
 				final.append(verb)
 				verb = ''
 				flagSubject = False
-			#
-			continue
+				if flagNegative:
+					final.append('no')
+					flagNegative = False
+			
+			
 		elif line[1] in '¿?.,':
 			flagArt = False
 			continue
@@ -276,6 +286,9 @@ def freelingParser(frobject):
 	if verb != '':
 		final.append(verb)
 
+	if flagNegative:
+		final.append('no')
+
 	if question != '':
 		final.append(question)
 
@@ -309,7 +322,7 @@ print "Corriendo"
 s.run()
 
 '''
-strTest = "quieres que me compre"
+strTest = "no querías que yo no me compre un coche"
 
 a = Lemmatizer()
 print a.lemma(strTest)

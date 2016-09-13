@@ -35,9 +35,9 @@ corría = correr + pasado + marca de incertidumbre (imperfecto).
 	* El dijo que ella no canta muy bien => el decir ella no bien cantar. 
 		=> Listo.
 - La negación se agrega después del verbo. Si esto no es así en la realidad, solo hay que agregarlo antes :D
-- 
+- Problema conocido: Muchas conjugaciones de la primera y tercera persona son la misma. Freeling asigna siempre la conjugación de la 3ra persona.
+	* e.g. que compre => que YO compre, que ÉL compre; freeling dirá que "compre" está en 3ra persona.
 '''
-#
 
 class Lemmatizer(object):
 	def lemma(self, text):
@@ -108,10 +108,12 @@ def freelingParser(frobject):
 	femenineWords = ['ella', 'esposa', 'tía', 'prima', 'hermana', 'cuñada', 'nuera', 'niña']
 	possessivs = ['mi', 'tu', 'su', 'nuestro', 'nuestra', 'vuestro', 'vuestra', 'sus']
 
-	pronouns2 = ['me', 'te', 'se', 'nos', 'os']
+	
 	pronouns = ["yo", "tú", "usted", "él","ella", "nosotros", "vosotros", "ustedes", "ellos", "ellas"]
 	pronounsDict = { "1S": "yo", "2S": "tú", "3S": "él",
 					 "1P": "nosotros", "2P": "ustedes", "3P": "ellos"}
+
+	pronouns2 = {'me':'a-mi', 'te':'a-ti', 'se':'se', 'nos':'a-nosotros', 'os':'a-vosotros', 'lo': 'eso', 'la': 'eso'}
 
 	tenses ={"I":"(imperfecto)", "F":"(futuro)","S":"(pasado)","C":"(condicional)"}
 
@@ -147,7 +149,15 @@ def freelingParser(frobject):
 			if line[2][3] != 'P':
 				final.insert(0, tenses[line[2][3]])
 				subjectPos += 1
-			flagArt = False
+			
+			#if there is no pronoun in the sentense, add it from the verb
+			if not flagSubject: 
+				final.append(pronounsDict[line[2][4:6]])
+			else:
+				#index = phrase.index(line)
+				flagSubject = False
+		
+			flagArt = False		
 			continue
 
 		elif line[1] == 'que':
@@ -188,7 +198,7 @@ def freelingParser(frobject):
 			#if there is already a verb, put it in the array since it is not the main verb.
 			if verb != '':
 				final.append(verb)
-				subjectPos+=1
+				#subjectPos+=1
 			
 			verb = line[1]
 			
@@ -196,21 +206,13 @@ def freelingParser(frobject):
 			#TODO: 2 verbal times
 			if line[2][3] != 'P':
 				final.insert(0, tenses[line[2][3]])
-				subjectPos += 1
 
-			#Look if there is a pronoun in the sentense
+			#if there is no pronoun in the sentense, add it from the verb
 			if not flagSubject: 
-				flag = False
-				for p in pronouns:
-					if p in final[subjectPos+1:]:
-						#There is a pronoun, so next time we find a verb, we search right next to the pronoun found
-						flag = True
-						subjectPos = final.index(p)
-
-				if flag:
-					continue
-				else:
-					final.append(pronounsDict[line[2][4:6]])
+				final.append(pronounsDict[line[2][4:6]])
+			else:
+				#index = phrase.index(line)
+				flagSubject = False
 		
 		elif line[1] == 'de':
 			flagDe = True
@@ -221,18 +223,32 @@ def freelingParser(frobject):
 			final.append(line[1])
 		
 		##Check if the pronoun if a reflexive or a indirect complement
-		##Known issue: Subjunctive of 1st and 3er person is the same. Freeling guess the verb as 3rd, so there is no way to guess the correct pronoun.
-		##ex: me compre => que yo me compre;  que él me compre. Both have differents meanings. 
-		elif line[1] in pronouns2:
+		elif line[1] in pronouns2.keys():
 			sub = line[2][2] + line[2][4]
-			if phrase[phrase.index(line)+1][2][4:6] == sub:
-				#It is actually a reflexive, we can add a pronoun from it
-				flagSubject = True
-				pronoun2 = line[0]
-				final.append(pronounsDict[sub])
+			index = phrase.index(line)
+			if phrase[index-1][2][0] == 'V' and phrase[index-1][2][2] == 'N':
+				##'Pronombre enclítico' add it in front of the verb
+				final.insert(index-1, pronouns2[line[1]])
+
 				
+				
+			elif phrase[index-2][2][0] == 'V' and phrase[index-2][2][2] == 'N' and phrase[index-1][0] == 'se':
+				##cases: selo, sela, sele, selos, selas, seles	
+				final.insert(index-2, pronouns2[line[1]])
+
+			elif phrase[index+1][2][0] == 'V' and phrase[index+1][2][4:6] == sub:
+				#It is actually a reflexive, we can add a pronoun from it
+				if not flagSubject:
+					flagSubject = True
+					final.append(pronounsDict[sub])
+				if pronoun2 != '':
+					final.append(pronouns2[pronoun2])
+				pronoun2 = line[0]
+			
 			else:
-				#It is a indirect complement, we store it to add it later
+				#It is a complement, we store it to add it later
+				if pronoun2 != '':
+					final.append(pronouns2[pronoun2])
 				pronoun2 = line[1]
 		
 		else:
@@ -243,7 +259,7 @@ def freelingParser(frobject):
 		
 	#Add pronoun2 pronoun, verb and question mark (if any)
 	if pronoun2 != '':
-		final.append(pronoun2)
+		final.append(pronouns2[pronoun2])
 
 	if verb != '':
 		final.append(verb)
@@ -284,7 +300,7 @@ print "Corriendo"
 s.run()
 
 '''
-strTest = "él quiso comerme"
+strTest = "la hija de mi hermana me la compró"
 
 a = Lemmatizer()
 print a.lemma(strTest)

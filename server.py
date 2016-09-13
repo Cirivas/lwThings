@@ -39,12 +39,15 @@ class Lemmatizer(object):
 
 		#Get videos of words. If the word doesnt have a video, add each letter as a word
 		print words
+		skip = ["(pasado)", "(futuro)", "(condicional)", "(imperfecto)"]
+		words = freelingParser(stream)
 		final = []
 		for word in words:
-			
-			if os.path.exists(os.getcwd() + '/vids/' + word + '.mp4'):
+			if word in skip:
+				continue
+			elif os.path.exists(os.getcwd() + '/vids/' + word + '.mp4'):
 				final.append(word)
-			else:
+			else:	
 				final.extend(word)
 		return final
 	def lemma(self, text):
@@ -58,7 +61,7 @@ class Lemmatizer(object):
 		#Run script
 		stream = os.popen("analyze -f es.cfg  < meh")
 
-		#Get lemmas
+		#Get restructured speech
 		words = freelingParser(stream)
 
 		final = []
@@ -130,21 +133,34 @@ def freelingParser(frobject):
 
 	#this variable helps to identify a participe verb used as a noun (el helado), so we do not add the lemma (helar).
 	flagArt = False
-
+	flagDe = False 
+	flagSubject = False 
 	verb = ''
 	question = ''
 	pronoun = ''
+	pronoun2 = ''
 
 	subjectPos = 0
 	questionMarks = ['qué', 'cómo']
-	femeninWords = ['ella', 'esposa', 'tía', 'prima', 'hermana', 'cuñada', 'nuera', 'niña']
+	femenineWords = ['ella', 'esposa', 'tía', 'prima', 'hermana', 'cuñada', 'nuera', 'niña']
+	possessivs = ['mi', 'tu', 'su', 'nuestro', 'nuestra', 'vuestro', 'vuestra', 'sus']
 
+	pronouns2 = ['me', 'te', 'se', 'nos', 'os']
 	pronouns = ["yo", "tú", "usted", "él","ella", "nosotros", "vosotros", "ustedes", "ellos", "ellas"]
 	pronounsDict = { "1S": "yo", "2S": "tú", "3S": "él",
 					 "1P": "nosotros", "2P": "ustedes", "3P": "ellos"}
 
 	tenses ={"I":"(imperfecto)", "F":"(futuro)","S":"(pasado)","C":"(condicional)"}
-	for line in frobject:
+
+	#Convert stream object to list, so we can iterate freely through it
+	phrase = []
+	for line in list(frobject):
+		if len(line) < 2:
+			continue
+		phrase.append(line.strip().split(' '))
+
+
+	for line in phrase:
 		'''
 		Line structure
 		- word: from the speech
@@ -152,15 +168,17 @@ def freelingParser(frobject):
 		- tags: depends on the word. Show if a word is a Noun, Verb, Adverb, etc, and characteristics of them. E.g. a Verb has a tense, mood, person, singular or plural, etc.
 		- prob: the probability of the lemma to be correct. 
 		'''
-		print line.strip()
-		line = line.strip().split(' ')
+		print line
 		
 		if len(line) < 2:
 			continue
-		elif line[1] in ['el', 'un']:
+		elif line[1] in ['el', 'un', 'uno']:
 			flagArt = True
 			continue
 		elif line[1] == 'ser':
+			if line[2][3] != 'P':
+				final.insert(0, tenses[line[2][3]])
+				subjectPos += 1
 			flagArt = False
 			continue
 		elif line[1] == 'que':
@@ -168,6 +186,8 @@ def freelingParser(frobject):
 			#If 'que' goes after a verb, we add the stored verb, since it is not the main verb.
 			if verb != '':
 				final.append(verb)
+				verb = ''
+				flagSubject = False
 			#
 			continue
 		elif line[1] in '¿?.,':
@@ -179,12 +199,13 @@ def freelingParser(frobject):
 			#e.g. 'el helado', 'el dado'.
 			final.append(line[0])
 			flagArt = False
+		
 		elif line[0] in questionMarks:
 			flagArt = False
 			#store question word to put it at the end
 			question = line[0]
 
-		elif line[0] in femeninWords:
+		elif line[0] in femenineWords:
 			flagArt = False
 			#Words like "ella", "esposa" have a masculine lema, but we need to keep it in femenine
 			final.append(line[0])
@@ -199,32 +220,84 @@ def freelingParser(frobject):
 			
 			verb = line[1]
 			
-			#identify subject and tense
+			#identify pronoun and tense
 			#TODO: 2 verbal times
 			if line[2][3] != 'P':
 				final.insert(0, tenses[line[2][3]])
 				subjectPos += 1
 
-			#Look if there is a subject in the sentense 
-			flag = False
-			for p in pronouns:
-				if p in final[subjectPos+1:]:
-					flag = True
-					subjectPos = final.index(p)
+			#Look if there is a pronoun in the sentense
+			if not flagSubject: 
+				flag = False
+				for p in pronouns:
+					if p in final[subjectPos+1:]:
+						#There is a pronoun, so next time we find a verb, we search right next to the pronoun found
+						flag = True
+						subjectPos = final.index(p)
 
-			if flag:
-				continue
+				if flag:
+					continue
+				else:
+					final.append(pronounsDict[line[2][4:6]])
+		
+		elif line[1] == 'de':
+			flagDe = True
+			final.append(line[1])
+		
+		elif line[1] in pronouns:
+			flagSubject = True
+			final.append(line[1])
+		
+		##Check if the pronoun if a reflexive or a indirect complement
+		##Known issue: Subjunctive of 1st and 3er person is the same. Freeling guess the verb as 3rd, so there is no way to guess the correct pronoun.
+		##ex: me compre => que yo me compre;  que él me compre. Both have differents meanings. 
+		elif line[1] in pronouns2:
+			sub = line[2][2] + line[2][4]
+			if phrase[phrase.index(line)+1][2][4:6] == sub:
+				#It is actually a reflexive, we can add a pronoun from it
+				flagSubject = True
+				pronoun2 = line[0]
+				final.append(pronounsDict[sub])
+				
 			else:
-				final.append(pronounsDict[line[2][4:6]])
+				#It is a indirect complement, we store it to add it later
+				pronoun2 = line[1]
 		
 		else:
+			if flagArt:
+				flagSubject = True
 			flagArt = False
 			final.append(line[1])
-	#Add verb and question mark (if any)
-	final.append(verb)
+		
+	#Add pronoun2 pronoun, verb and question mark (if any)
+	if pronoun2 != '':
+		final.append(pronoun2)
+
+	if verb != '':
+		final.append(verb)
 
 	if question != '':
 		final.append(question)
+
+	#De-inversion, only works in possession cases
+	if flagDe:
+		i = final.index('de')
+
+		if final[i+1] in possessivs:
+			auxPos = final[i+1]
+			auxNoun = final[i+2]
+			print auxPos
+			del final[i+1]
+			print auxPos
+			final[i+1] = final[i-1]
+			final[i-1] = auxNoun
+			final.insert(i-1, auxPos)
+			
+		else:
+			aux = final[i+1]
+			final[i+1] = final[i-1]
+			final[i-1] = aux
+
 	
 	print final
 	return final
@@ -236,31 +309,7 @@ print "Corriendo"
 s.run()
 
 '''
-strTest = "el hermano de la niña que cantaba está bien"
-
-'''
-string = pes.parse(strTest, relations=True, lemmata=True)
+strTest = "quieres que me compre"
 
 a = Lemmatizer()
 print a.lemma(strTest)
-
-pes.pprint(string)
-'''
-meh = open("meh", "w")
-meh.write(strTest)
-meh.close()
-
-stream = os.popen("analyze -f es.cfg  < meh")
-
-#stream2 = os.popen("analyze -f es.cfg --output conll < meh")
-skip = ["(pasado)", "(futuro)", "(condicional)", "(imperfecto)"]
-words = freelingParser(stream)
-final = []
-for word in words:
-	if word in skip:
-		continue
-	elif os.path.exists(os.getcwd() + '/vids/' + word + '.mp4'):
-		final.append(word)
-	else:	
-		final.extend(word)
-print final

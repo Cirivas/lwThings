@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 import zerorpc
-import pattern.es as pes
-from unidecode import unidecode
 import os
 
 '''

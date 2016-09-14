@@ -5,6 +5,12 @@ curl -sL https://deb.nodesource.com/setup_4.x | sudo -E bash -
 
 sudo apt-get install -y nodejs
 
+### Zmq
+
+Existe un problema con la librería ZMQ, hay que instalarla manualmente.
+
+https://github.com/JustinTulloss/zeromq.node
+
 ## Freeling
 download: https://github.com/TALP-UPC/FreeLing/releases
 

@@ -121,7 +121,7 @@ def freelingParser(frobject):
 				final.insert(0, tenses[line[2][3]])
 		
 			#if there is no pronoun in the sentense, add it from the verb
-			if not flagSubject: 
+			if not flagSubject and pronounsDict[line[2][4:6]] not in final: 
 				final.append(pronounsDict[line[2][4:6]])
 			else:				
 				flagSubject = False
@@ -176,7 +176,7 @@ def freelingParser(frobject):
 				final.insert(0, tenses[line[2][3]])
 
 			#if there is no pronoun in the sentense, add it from the verb
-			if not flagSubject: 
+			if not flagSubject and pronounsDict[line[2][4:6]] not in final:
 				final.append(pronounsDict[line[2][4:6]])
 			else:
 				flagSubject = False
@@ -206,7 +206,7 @@ def freelingParser(frobject):
 
 			elif phrase[index+1][2][0] == 'V' and phrase[index+1][2][4:6] == sub:
 				#It is actually a reflexive, we can add a pronoun from it
-				if not flagSubject:
+				if not flagSubject and pronounsDict[sub] not in final:
 					flagSubject = True
 					final.append(pronounsDict[sub])
 				if pronoun2 != '':
@@ -270,7 +270,7 @@ print "Corriendo"
 s.run()
 
 '''
-strTest = "la hija de mi hermana me la compró"
+strTest = "No sé si mañana iré a la piscina"
 
 a = Lemmatizer()
 print a.lemma(strTest)

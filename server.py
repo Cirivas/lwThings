@@ -103,10 +103,9 @@ def freelingParser(frobject):
 	pronoun = ''
 	pronoun2 = ''
 
-	subjectPos = 0
 	questionMarks = ['qué', 'cómo']
-	femenineWords = ['ella', 'esposa', 'tía', 'prima', 'hermana', 'cuñada', 'nuera', 'niña']
-	possessivs = ['mi', 'tu', 'su', 'nuestro', 'nuestra', 'vuestro', 'vuestra', 'sus']
+	femenineWords = ['ella', 'esposa', 'tía', 'prima', 'hermana', 'cuñada', 'nuera', 'niña', 'hija']
+	possessives = ['mi', 'tu', 'su', 'nuestro', 'nuestra', 'vuestro', 'vuestra', 'sus']
 
 	
 	pronouns = ["yo", "tú", "usted", "él","ella", "nosotros", "vosotros", "ustedes", "ellos", "ellas"]
@@ -128,10 +127,10 @@ def freelingParser(frobject):
 	for line in phrase:
 		'''
 		Line structure
-		- word: from the speech
-		- lemma: lemma of the word (e.g. cantó => cantar, dulces => dulce)
-		- tags: depends on the word. Show if a word is a Noun, Verb, Adverb, etc, and characteristics of them. E.g. a Verb has a tense, mood, person, singular or plural, etc.
-		- prob: the probability of the lemma to be correct. 
+		- line[0] word: from the speech
+		- line[1] lemma: lemma of the word (e.g. cantó => cantar, dulces => dulce)
+		- line[2] tags: depends on the word. Show if a word is a Noun, Verb, Adverb, etc, and characteristics of them. E.g. a Verb has a tense, mood, person, singular or plural, etc.
+		- line[3] prob: the probability of the lemma to be correct. 
 		'''
 		print line
 		
@@ -148,17 +147,14 @@ def freelingParser(frobject):
 		elif line[1] == 'ser':
 			if line[2][3] != 'P':
 				final.insert(0, tenses[line[2][3]])
-				subjectPos += 1
-			
+		
 			#if there is no pronoun in the sentense, add it from the verb
 			if not flagSubject: 
 				final.append(pronounsDict[line[2][4:6]])
-			else:
-				#index = phrase.index(line)
+			else:				
 				flagSubject = False
-		
+
 			flagArt = False		
-			continue
 
 		elif line[1] == 'que':
 			flagArt = False
@@ -198,7 +194,7 @@ def freelingParser(frobject):
 			#if there is already a verb, put it in the array since it is not the main verb.
 			if verb != '':
 				final.append(verb)
-				#subjectPos+=1
+			
 			
 			verb = line[1]
 			
@@ -211,7 +207,6 @@ def freelingParser(frobject):
 			if not flagSubject: 
 				final.append(pronounsDict[line[2][4:6]])
 			else:
-				#index = phrase.index(line)
 				flagSubject = False
 		
 		elif line[1] == 'de':
@@ -224,6 +219,7 @@ def freelingParser(frobject):
 		
 		##Check if the pronoun if a reflexive or a indirect complement
 		elif line[1] in pronouns2.keys():
+			flagArt = False
 			sub = line[2][2] + line[2][4]
 			index = phrase.index(line)
 			if phrase[index-1][2][0] == 'V' and phrase[index-1][2][2] == 'N':
@@ -270,11 +266,13 @@ def freelingParser(frobject):
 	if question != '':
 		final.append(question)
 
-	#De-inversion, only works in possession cases
+	#De-inversion, only has sense if it is a possession case.
+	#ToDo: look for adjectives
+	#Working cases: <noun> de [<possessive>] noun
 	if flagDe:
 		i = final.index('de')
 
-		if final[i+1] in possessivs:
+		if final[i+1] in possessives:
 			auxPos = final[i+1]
 			auxNoun = final[i+2]
 			print auxPos

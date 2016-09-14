@@ -62,34 +62,6 @@ class Lemmatizer(object):
 				final.extend(word)
 		return final
 
-
-def semiStemmer(word):
-	pronouns = ["me", "se", "sele", "selo", "sela", "selos", "selas", "seles", "la", "le", "lo", "las", "les", "los", "nos"]
-	oldEnd = ["iéndo", "ándo", "ár", "ér", "ír"]
-	newEnd = ["iendo", "ando", "ar", "er", "ir"]
-
-	vowels = ["a", "á", "e", "é", "i", "í", "o", "ó", "u", "ú", "ü"]
-	consonants = ["b","c","d","f","g","h","j","k","l","m","n","p","q","r","s","t","v","w","x","y","z"]
-
-	maxN = 0
-	pronoun = ''
-	for p in pronouns:
-		if p == word[-len(p):]:
-			if maxN < len(p):
-				maxN = len(p)
-				pronoun = p
-	newWord = word[:len(word)-maxN]
-
-	p1 = ''
-	p2 = ''
-	if maxN > 3:
-		p1, p2 = pronoun[:2], pronoun[2:]
-	else:
-		p1 = pronoun
-
-	print unidecode(newWord), p1, p2
-	return unidecode(newWord), p1, p2
-
 def freelingParser(frobject):
 	final = []
 

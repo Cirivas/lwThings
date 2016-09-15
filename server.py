@@ -38,7 +38,7 @@ corría = correr + pasado + marca de incertidumbre (imperfecto).
 '''
 
 class Lemmatizer(object):
-	def lemma(self, text):
+	def lemma2(self, text):
 		print "Lematizacion de", text
 		
 		#Create file
@@ -52,6 +52,16 @@ class Lemmatizer(object):
 		#Get restructured speech
 		words = freelingParser(stream)
 
+		final = []
+		for word in words:			
+			if os.path.exists(os.getcwd() + '/vids/' + word + '.mp4'):
+				final.append(word)
+			else:
+				final.extend(word)
+		return final
+
+	def lemma(self, text):
+		words = text.split(' ')
 		final = []
 		for word in words:			
 			if os.path.exists(os.getcwd() + '/vids/' + word + '.mp4'):

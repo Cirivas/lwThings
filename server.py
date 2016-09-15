@@ -261,7 +261,7 @@ def freelingParser(frobject):
 	print final
 	return final
 
-'''
+
 s = zerorpc.Server(Lemmatizer())
 s.bind("tcp://0.0.0.0:4242")
 print "Corriendo"
@@ -272,3 +272,4 @@ strTest = "No sé si mañana iré a la piscina"
 
 a = Lemmatizer()
 print a.lemma(strTest)
+'''

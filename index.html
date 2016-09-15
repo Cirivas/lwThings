@@ -344,7 +344,7 @@
 	//Get the words or to spell.
 	function wordsAndLetters(text){
 		var http = new XMLHttpRequest();
-		var params = 'text='+text;
+		var params = 'text='+text.toLowerCase();
 		http.open('POST','http://signit.brazilsouth.cloudapp.azure.com:80/pet/', false);
 		http.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 		http.send(params);		

@@ -328,14 +328,14 @@
 	function generateWords(text){
 		words = wordsAndLetters(text);
 		wordsIndex = 0;
-		signVideo.src = "/vids/"+words[wordsIndex]+".mp4";
+		signVideo.src = "http://signit.brazilsouth.cloudapp.azure.com/vids/"+words[wordsIndex]+".mp4";
 		signVideo.load();
 		wordsIndex++;
 	}
 
 	signVideo.onended = function() {
 		if(wordsIndex < words.length) {
-			signVideo.src = "/vids/"+words[wordsIndex]+".mp4";
+			signVideo.src = "http://signit.brazilsouth.cloudapp.azure.com/vids/"+words[wordsIndex]+".mp4";
 			signVideo.load();
 			wordsIndex++;
 		}

@@ -345,7 +345,7 @@
 	function wordsAndLetters(text){
 		var http = new XMLHttpRequest();
 		var params = 'text='+text;
-		http.open('POST','http://10.0.0.4:8080/pet/', false);
+		http.open('POST','http://signit.brazilsouth.cloudapp.azure.com:80/pet/', false);
 		http.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 		http.send(params);		
 		return JSON.parse(http.response);

@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 import zerorpc
 import os
+import sys
+reload(sys)
+sys.setdefaultencoding('utf-8')
 
 '''
 Notas:

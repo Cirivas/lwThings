@@ -57,16 +57,7 @@ class Lemmatizer(object):
 			if os.path.exists(os.getcwd() + '/vids/' + word + '.mp4'):
 				final.append(word)
 			else:
-				final.extend(word)
-		return final
-
-	def lemma2(self, text):
-		words = text.split(' ')
-		final = []
-		for word in words:			
-			if os.path.exists(os.getcwd() + '/vids/' + word + '.mp4'):
-				final.append(word)
-			else:
+				word = unicode(word)
 				final.extend(word)
 		return final
 
@@ -129,7 +120,7 @@ def freelingParser(frobject):
 				final.insert(0, tenses[line[2][3]])
 		
 			#if there is no pronoun in the sentense, add it from the verb
-			if not flagSubject and pronounsDict[line[2][4:6]] not in final: 
+			if not flagSubject and not (pronounsDict[line[2][4:6]] in final or 'ella' in final):
 				final.append(pronounsDict[line[2][4:6]])
 			else:				
 				flagSubject = False
@@ -214,7 +205,7 @@ def freelingParser(frobject):
 
 			elif phrase[index+1][2][0] == 'V' and phrase[index+1][2][4:6] == sub:
 				#It is actually a reflexive, we can add a pronoun from it
-				if not flagSubject and pronounsDict[sub] not in final:
+				if not flagSubject and not (pronounsDict[sub] in final or 'ella' in final):
 					flagSubject = True
 					final.append(pronounsDict[sub])
 				if pronoun2 != '':

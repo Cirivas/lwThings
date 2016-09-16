@@ -328,6 +328,7 @@
 	function generateWords(text){
 		words = wordsAndLetters(text);
 		wordsIndex = 0;
+		console.log(words);
 		var word = intsToChars(words[wordsIndex].data);
 		console.log(word);
 		signVideo.src = "http://signit.brazilsouth.cloudapp.azure.com/vids/"+word+".mp4";

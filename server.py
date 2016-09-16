@@ -53,12 +53,12 @@ class Lemmatizer(object):
 		words = freelingParser(stream)
 
 		final = []
-		#for word in words:			
-		#	if os.path.exists(os.getcwd() + '/vids/' + word + '.mp4'):
-		#		final.append(word)
-		#	else:
-		#		final.extend(word)
-		return words
+		for word in words:			
+			if os.path.exists(os.getcwd() + '/vids/' + word + '.mp4'):
+				final.append(word)
+			else:
+				final.extend(word)
+		return final
 
 	def lemma2(self, text):
 		words = text.split(' ')

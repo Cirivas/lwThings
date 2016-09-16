@@ -5,7 +5,7 @@ var path 	= require('path')
 var bodyParser = require('body-parser')
 var app		= express()
 var router 	= express.Router()
-var client = new zerorpc.Client()
+var client = new zerorpc.Client({heartbeatInterval: 15000})
 
 //ZeroRPC python-nodejs 
 client.connect("tcp://10.0.0.4:4242")

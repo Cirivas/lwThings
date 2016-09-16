@@ -18,11 +18,11 @@ app.use(bodyParser.json())
 
 router.post('/pet', function(req, res){
 	console.log("Node: Lematizacion de " + req.body.text)
-	setTimeout(client.invoke("lemma",req.body.text, function(err, resp, more){
-		if(err) console.log("Error")
+	client.invoke("lemma",req.body.text, function(err, resp, more){
+		if(err) console.log(err)
 		console.log("Lema: " + resp)
 		res.send(resp)
-	}), 7000)
+	})
 })
 
 //Send index file

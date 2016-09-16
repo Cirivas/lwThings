@@ -328,14 +328,17 @@
 	function generateWords(text){
 		words = wordsAndLetters(text);
 		wordsIndex = 0;
-		signVideo.src = "http://signit.brazilsouth.cloudapp.azure.com/vids/"+words[wordsIndex]+".mp4";
+		var word = intsToChars(words[wordsIndex].data);
+		console.log(word);
+		signVideo.src = "http://signit.brazilsouth.cloudapp.azure.com/vids/"+word+".mp4";
 		signVideo.load();
 		wordsIndex++;
 	}
 
 	signVideo.onended = function() {
 		if(wordsIndex < words.length) {
-			signVideo.src = "http://signit.brazilsouth.cloudapp.azure.com/vids/"+words[wordsIndex]+".mp4";
+			var word = intsToChars(words[wordsIndex].data);
+			signVideo.src = "http://signit.brazilsouth.cloudapp.azure.com/vids/"+word+".mp4";
 			signVideo.load();
 			wordsIndex++;
 		}
@@ -348,6 +351,15 @@
 		http.open('POST','http://signit.brazilsouth.cloudapp.azure.com:80/pet/', false);
 		http.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 		http.send(params);		
+
 		return JSON.parse(http.response);
+	}
+
+	function intsToChars(arr){
+		var word = '';
+		for (var i = 0, len = arr.length; i < len; i++) {
+			word += String.fromCharCode(arr[i]);
+		}
+		return word;
 	}
 </script>

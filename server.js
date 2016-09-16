@@ -20,7 +20,7 @@ router.post('/pet', function(req, res){
 	console.log("Node: Lematizacion de " + req.body.text)
 	client.invoke("lemma",req.body.text, function(err, resp, more){
 		if(err) console.log(err)
-		console.log("Lema: " + resp)
+		console.log("Texto nuevo: " + resp)
 		res.send(resp)
 	})
 })

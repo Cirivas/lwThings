@@ -38,7 +38,7 @@ corría = correr + pasado + marca de incertidumbre (imperfecto).
 '''
 
 class Lemmatizer(object):
-	def lemma2(self, text):
+	def lemma(self, text):
 		print "Lematizacion de", text
 		
 		#Create file
@@ -60,7 +60,7 @@ class Lemmatizer(object):
 				final.extend(word)
 		return final
 
-	def lemma(self, text):
+	def lemma2(self, text):
 		words = text.split(' ')
 		final = []
 		for word in words:			

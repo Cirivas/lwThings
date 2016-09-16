@@ -184,7 +184,7 @@ def freelingParser(frobject):
 				final.insert(0, tenses[line[2][3]])
 
 			#if there is no pronoun in the sentense, add it from the verb
-			if not flagSubject and pronounsDict[line[2][4:6]] not in final:
+			if not flagSubject: #and pronounsDict[line[2][4:6]] not in final:
 				final.append(pronounsDict[line[2][4:6]])
 			else:
 				flagSubject = False

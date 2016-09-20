@@ -1,2 +1,3 @@
 /node_modules/*
-/vids/*
+/public/vids/*
+/public/bower_components/*

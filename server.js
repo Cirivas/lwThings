@@ -32,10 +32,11 @@ router.get('/', function(req, res){
 
 //Serve videos
 router.get('/vids/:video', function(req, res){
-	res.sendFile(path.join(__dirname+'/vids/'+req.params.video))
+	res.sendFile(path.join(__dirname+'/public/vids/'+req.params.video))
 })
 
 app.use(router)
+app.use(express.static('public'))
 app.listen(8080, function(){
 	console.log("Example app")
 })

@@ -385,14 +385,14 @@
 	function generateWords(response){
 		words = response;
 		wordsIndex = 0;
-		signVideo.src = "vids/"+words[wordsIndex]+".mp4";
+		//signVideo.src = "vids/"+words[wordsIndex]+".mp4";
 		signVideo.load();
 		wordsIndex++;
 	}
 
 	signVideo.onended = function() {
 		if(wordsIndex < words.length) {
-			signVideo.src = "vids/"+words[wordsIndex]+".mp4";
+			//signVideo.src = "vids/"+words[wordsIndex]+".mp4";
 			signVideo.load();
 			wordsIndex++;
 		}
@@ -405,7 +405,7 @@
 		http.onreadystatechange = function(){
 			if(this.readyState == 4 && this.status == 200) generateWords(JSON.parse(this.response));
 		}
-		http.open('POST','http://localhost:8080/pet/', true);
+		//http.open('POST','http://localhost:8080/pet/', true);
 		http.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 		
 		http.send(params);		

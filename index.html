@@ -255,7 +255,7 @@
 	      		if (event.results[i].isFinal) {
 	        		final_transcript += event.results[i][0].transcript;
 	        		texto.innerHTML = final_transcript;
-	        		generateWords(event.results[i][0].transcript);
+	        		wordsAndLetters(event.results[i][0].transcript);
 	      		} else {
 	        		interim_transcript += event.results[i][0].transcript;
 	      		}
@@ -325,17 +325,17 @@
 	var words;
 	var wordsIndex = 0;
 	//Generates the letters' array and show the first video
-	function generateWords(text){
-		words = wordsAndLetters(text);
+	function generateWords(response){
+		words = response;
 		wordsIndex = 0;
-		signVideo.src = "http://signit.brazilsouth.cloudapp.azure.com/vids/"+words[wordsIndex]+".mp4";
+		signVideo.src = "vids/"+words[wordsIndex]+".mp4";
 		signVideo.load();
 		wordsIndex++;
 	}
 
 	signVideo.onended = function() {
 		if(wordsIndex < words.length) {
-			signVideo.src = "http://signit.brazilsouth.cloudapp.azure.com/vids/"+words[wordsIndex]+".mp4";
+			signVideo.src = "vids/"+words[wordsIndex]+".mp4";
 			signVideo.load();
 			wordsIndex++;
 		}
@@ -345,9 +345,12 @@
 	function wordsAndLetters(text){
 		var http = new XMLHttpRequest();
 		var params = 'text='+text.toLowerCase();
-		http.open('POST','http://signit.brazilsouth.cloudapp.azure.com:80/pet/', false);
+		http.onreadystatechange = function(){
+			if(this.readyState == 4 && this.status == 200) generateWords(JSON.parse(this.response));
+		}
+		http.open('POST','http://localhost:8080/pet/', true);
 		http.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+		
 		http.send(params);		
-		return JSON.parse(http.response);
 	}
 </script>

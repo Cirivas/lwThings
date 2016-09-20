@@ -267,7 +267,7 @@ def freelingParser(frobject):
 
 
 s = zerorpc.Server(Lemmatizer())
-s.bind("tcp://10.0.0.4:4242")
+s.bind("tcp://0.0.0.0:4242")
 print "Corriendo"
 s.run()
 

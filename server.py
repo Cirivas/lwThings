@@ -57,7 +57,7 @@ class Lemmatizer(object):
 
 		final = []
 		for word in words:			
-			if os.path.exists(os.getcwd() + '/vids/' + word + '.mp4'):
+			if os.path.exists(os.getcwd() + '/public/vids/' + word + '.mp4'):
 				final.append(word)
 			else:
 				word = unicode(word)

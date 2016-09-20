@@ -83,42 +83,83 @@
 		</style>
 	</head>
 	<body>
-		<h1 class="center" id="headline">
-			Demostración WebSpeech
-		</h1>
-		<div id="info">
-		  <p id="info_start">Click en comenzar para iniciar la grabación.</p>
-		  <p id="info_speak_now">Escuchando...</p>
-		  <p id="info_no_speech">No se detectó habla <a href="//support.google.com/chrome/bin/answer.py?hl=en&amp;answer=1407892">Aqui</a></p>
-		  <p id="info_no_microphone" style="display:none"> No se encontró micrófono </p>
-		  <p id="info_allow">Click en "Permitir" para usar el micrófono.</p>
-		  <p id="info_denied">Permiso para utilizar el micrófono fue denegado.</p>
-		  <p id="info_blocked">El micrófono está bloqueado, puede cambiarlo en chrome://settings/contentExceptions#media-stream</p>
-		  <p id="info_upgrade">Web Speech API is not supported by this browser.
-		     Upgrade to <a href="//www.google.com/chrome">Chrome</a>
-		     version 25 or later.</p>
+		<div class="row">
+			<h1 class="center" id="headline">
+				Demostración SignIt
+			</h1>
 		</div>
-		<div id="results">
-		  <span id="final_span" class="final"></span>
-		  <span id="interim_span" class="interim"></span>
-		  <p>
+		<div class="row">
+			<div class="col-md-6">
+				<div id="info">
+				  <p id="info_start">Click en comenzar para iniciar la grabación.</p>
+				  <p id="info_speak_now">Escuchando...</p>
+				  <p id="info_no_speech">No se detectó habla <a href="//support.google.com/chrome/bin/answer.py?hl=en&amp;answer=1407892">Aqui</a></p>
+				  <p id="info_no_microphone" style="display:none"> No se encontró micrófono </p>
+				  <p id="info_allow">Click en "Permitir" para usar el micrófono.</p>
+				  <p id="info_denied">Permiso para utilizar el micrófono fue denegado.</p>
+				  <p id="info_blocked">El micrófono está bloqueado, puede cambiarlo en chrome://settings/contentExceptions#media-stream</p>
+				  <p id="info_upgrade">Web Speech API is not supported by this browser.
+				     Upgrade to <a href="//www.google.com/chrome">Chrome</a>
+				     version 25 or later.</p>
+				</div>
+				<div id="results">
+				  <span id="final_span" class="final"></span>
+				  <span id="interim_span" class="interim"></span>
+				  <p>
+				</div>
+				<div class="center">
+					 <button id="start_button" onclick="startButton(event)">
+				    Comenzar</button>
+				  <div id="div_language">
+				    <select id="select_language" onchange="updateCountry()"></select>
+				    &nbsp;&nbsp;
+				    <select id="select_dialect"></select>
+				  </div>
+				</div>
+			</div>
+			<div class="col-md-6">
+				<h2 class="center">Listado de Palabras disponibles</h2>
+				<div class="row">
+					<div class="col-md-4">
+						<h3 class="center">Sustantivos</h3>
+						<ul>
+							<li>Idea</li>
+							<li>Búho</li>
+							<li>Patio</li>
+							<li>Tío</li>
+						</ul>
+					</div>
+					<div class="col-md-4">
+						<h3 class="center">Verbos</h3>
+					</div>
+					<div class="col-md-4">
+						<h3 class="center">Otros</h3>
+						<ul>
+							<li>Muy</li>
+							<li>De (posesivo)</li>
+							<li>Mi</li>
+						</ul>
+					</div>
+				</div>				
+			</div>
 		</div>
-		<div class="center">
-			 <button id="start_button" onclick="startButton(event)">
-		    Comenzar</button>
-		  <div id="div_language">
-		    <select id="select_language" onchange="updateCountry()"></select>
-		    &nbsp;&nbsp;
-		    <select id="select_dialect"></select>
-		  </div>
-		</div>
-		<div class="center">
-			<div id="texto"></div>
-		</div>
-		<div class="center">
-			<video style="z-index:1" id="signVideo" width="288" height="192" preload="auto" autoplay />
-		</div>
-		</object>
+		<div class="row">
+			<div class="col-md-6">
+				<div class="center">
+					<div id="texto"></div>
+				</div>
+				<div class="center">
+					<video style="z-index:1" id="signVideo" width="288" height="192" preload="auto" autoplay></video>
+				</div>
+			</div>
+			<div class="col-md-6">
+				<h2 class="center">Frases ejemplo</h2>
+				<ul>
+					<li>Mi idea es muy buena</li>
+					<li>El patio de mi hija es bonito</li>
+				</ul>
+			</div>
+		</div>	
 	</body>
 </html>
 <script>
@@ -337,14 +378,14 @@
 	function generateWords(response){
 		words = response;
 		wordsIndex = 0;
-		signVideo.src = "vids/"+words[wordsIndex]+".mp4";
+		signVideo.src = "http://signit.brazilsouth.cloudapp.azure.com/vids/"+words[wordsIndex]+".mp4";
 		signVideo.load();
 		wordsIndex++;
 	}
 
 	signVideo.onended = function() {
 		if(wordsIndex < words.length) {
-			signVideo.src = "vids/"+words[wordsIndex]+".mp4";
+			signVideo.src = "http://signit.brazilsouth.cloudapp.azure.com/vids/"+words[wordsIndex]+".mp4";
 			signVideo.load();
 			wordsIndex++;
 		}
@@ -357,9 +398,8 @@
 		http.onreadystatechange = function(){
 			if(this.readyState == 4 && this.status == 200) generateWords(JSON.parse(this.response));
 		}
-		http.open('POST','http://localhost:8080/pet/', true);
+		http.open('POST','http://signit.brazilsouth.cloudapp.azure.com:80/pet/', false);
 		http.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-		
 		http.send(params);		
 	}
 </script>

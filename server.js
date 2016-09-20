@@ -27,7 +27,7 @@ router.post('/pet', function(req, res){
 
 //Send index file
 router.get('/', function(req, res){
-	res.sendFile(path.join(__dirname+'/index.html'))
+	res.sendFile(path.join(__dirname+'/public/index.html'))
 })
 
 //Serve videos

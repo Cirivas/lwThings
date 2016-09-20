@@ -8,7 +8,7 @@ var router 	= express.Router()
 var client = new zerorpc.Client({heartbeatInterval: 15000})
 
 //ZeroRPC python-nodejs 
-client.connect("tcp://10.0.0.4:4242")
+client.connect("tcp://127.0.0.1:4242")
 
 app.disable('x-powered-by')
 app.use(cors())
@@ -32,10 +32,11 @@ router.get('/', function(req, res){
 
 //Serve videos
 router.get('/vids/:video', function(req, res){
-	res.sendFile(path.join(__dirname+'/vids/'+req.params.video))
+	res.sendFile(path.join(__dirname+'/public/vids/'+req.params.video))
 })
 
 app.use(router)
+app.use(express.static('public'))
 app.listen(8080, function(){
 	console.log("Example app")
 })

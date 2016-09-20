@@ -57,7 +57,7 @@ class Lemmatizer(object):
 
 		final = []
 		for word in words:			
-			if os.path.exists(os.getcwd() + '/vids/' + word + '.mp4'):
+			if os.path.exists(os.getcwd() + '/public/vids/' + word + '.mp4'):
 				final.append(word)
 			else:
 				word = unicode(word)
@@ -267,7 +267,7 @@ def freelingParser(frobject):
 
 
 s = zerorpc.Server(Lemmatizer())
-s.bind("tcp://10.0.0.4:4242")
+s.bind("tcp://0.0.0.0:4242")
 print "Corriendo"
 s.run()
 

@@ -190,7 +190,7 @@ def freelingParser(frobject):
 			flagSubject = True
 			final.append(line[1])
 		
-		##Check if the pronoun if a reflexive or a indirect complement
+		##Check if the pronoun if a reflexive or a complement
 		elif line[1] in pronouns2.keys():
 			flagArt = False
 			sub = line[2][2] + line[2][4]
@@ -198,8 +198,6 @@ def freelingParser(frobject):
 			if phrase[index-1][2][0] == 'V' and phrase[index-1][2][2] == 'N':
 				##'Pronombre enclítico' add it in front of the verb
 				final.insert(index-1, pronouns2[line[1]])
-
-				
 				
 			elif phrase[index-2][2][0] == 'V' and phrase[index-2][2][2] == 'N' and phrase[index-1][0] == 'se':
 				##cases: selo, sela, sele, selos, selas, seles	
@@ -241,16 +239,14 @@ def freelingParser(frobject):
 
 	#De-inversion, only has sense if it is a possession case.
 	#ToDo: look for adjectives
-	#Working cases: <noun> de [<possessive>] noun
+	#Working case: <noun> de [<possessive>] noun
 	if flagDe:
 		i = final.index('de')
 
 		if final[i+1] in possessives:
 			auxPos = final[i+1]
 			auxNoun = final[i+2]
-			print auxPos
 			del final[i+1]
-			print auxPos
 			final[i+1] = final[i-1]
 			final[i-1] = auxNoun
 			final.insert(i-1, auxPos)

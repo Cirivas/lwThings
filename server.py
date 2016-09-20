@@ -58,10 +58,9 @@ class Lemmatizer(object):
 		final = []
 		for word in words:			
 			if os.path.exists(os.getcwd() + '/public/vids/' + word + '.mp4'):
-				final.append(word)
+				final.append(unicode(word))
 			else:
-				word = unicode(word)
-				final.extend(word)
+				final.extend(unicode(word))
 		return final
 
 def freelingParser(frobject):

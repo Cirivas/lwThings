@@ -130,22 +130,43 @@
 				<h2 class="center">Listado de Palabras disponibles</h2>
 				<div class="row" ng-controller="WordCtrl">
 					<div class="col-md-4">
-						<h3 class="center">Sustantivos</h3>
-						<ul ng-repeat="word in words">
-								<li ng-if="word.type=='sust'">{{word.word}}</li>
-						</ul> 					
+						<div class="panel panel-default">
+							<div class="panel-heading">
+								<h3 class="panel-title">Sustantivos</h3>
+							</div>
+							<div class="panel-body" style="max-height: 10;overflow-y: scroll;">
+								<ul ng-repeat="word in words">
+									<li ng-if="word.type=='sust'">{{word.word}}</li>
+								</ul> 					
+							</div>
+						</div>
+					</div>
+					
+					<div class="col-md-4">
+						<div class="panel panel-default">
+							<div class="panel-heading">
+								<h3 class="panel-title">Verbos</h3>
+							</div>
+						
+							<div class="panel-body" style="max-height: 10;overflow-y: scroll;">
+								<ul ng-repeat="word in words">
+									<li ng-if="word.type=='verb'">{{word.word}}</li>
+								</ul> 
+							</div>
+						</div>
 					</div>
 					<div class="col-md-4">
-						<h3 class="center">Verbos</h3>
-						<ul ng-repeat="word in words">
-								<li ng-if="word.type=='verb'">{{word.word}}</li>
-						</ul> 
-					</div>
-					<div class="col-md-4">
-						<h3 class="center">Otros</h3>		
-						<ul ng-repeat="word in words">
-							<li ng-if="word.type=='otro'">{{word.word}}</li>
-						</ul> 
+						<div class="panel panel-default">
+							<div class="panel-heading">
+								<h3 class="panel-title">Otros</h3>		
+							</div>
+						
+							<div class="panel-body" style="max-height: 10;overflow-y: scroll;">
+								<ul ng-repeat="word in words">
+									<li ng-if="word.type=='otro'">{{word.word}}</li>
+								</ul> 
+							</div>
+						</div>
 					</div>
 				</div>				
 			</div>
@@ -381,21 +402,23 @@
 	//Video vars
 	var words;
 	var wordsIndex = 0;
+	var videoEnded = true;
 	//Generates the letters' array and show the first video
 	function generateWords(response){
 		words = response;
+		videoEnded = false;
 		wordsIndex = 0;
-		//signVideo.src = "vids/"+words[wordsIndex]+".mp4";
+		signVideo.src = "vids/"+words[wordsIndex]+".mp4";
 		signVideo.load();
 		wordsIndex++;
 	}
 
 	signVideo.onended = function() {
 		if(wordsIndex < words.length) {
-			//signVideo.src = "vids/"+words[wordsIndex]+".mp4";
+			signVideo.src = "vids/"+words[wordsIndex]+".mp4";
 			signVideo.load();
 			wordsIndex++;
-		}
+		} else videoEnded = true;
 	}
 
 	//Get the words or to spell.
@@ -403,9 +426,12 @@
 		var http = new XMLHttpRequest();
 		var params = 'text='+text.toLowerCase();
 		http.onreadystatechange = function(){
-			if(this.readyState == 4 && this.status == 200) generateWords(JSON.parse(this.response));
+			if(this.readyState == 4 && this.status == 200) {
+				if(videoEnded) generateWords(JSON.parse(this.response));
+				else words = words.concat(JSON.parse(this.response));
+			}
 		}
-		//http.open('POST','http://localhost:8080/pet/', true);
+		http.open('POST','http://localhost:8080/pet/', true);
 		http.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 		
 		http.send(params);		

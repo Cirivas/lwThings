@@ -26,7 +26,7 @@
 			</h1>
 		</div>
 		<div class="row">
-			<div class="col-md-6">
+			<div class="col-md-offset-1 col-md-5">
 				<div id="info">
 				  <p id="info_start">Click en comenzar para iniciar la grabación.</p>
 				  <p id="info_speak_now">Escuchando...</p>
@@ -54,7 +54,7 @@
 				  </div>
 				</div>
 			</div>
-			<div class="col-md-6" ng-app="signit" ng-controller="WordCtrl">
+			<div class="col-md-4" ng-app="signit" ng-controller="WordCtrl">
 				<h2 class="center">Listado de Palabras disponibles</h2>
 				<div class="row" ng-controller="WordCtrl">
 					<div class="col-md-4">
@@ -62,7 +62,7 @@
 							<div class="panel-heading">
 								<h3 class="panel-title">Sustantivos</h3>
 							</div>
-							<div class="panel-body" style="max-height: 10;overflow-y: scroll;">
+							<div class="panel-body" style="max-height: 70em;overflow-y: scroll;">
 								<ul ng-repeat="word in words">
 									<li ng-if="word.type=='sust'">{{word.word}}</li>
 								</ul> 					
@@ -76,7 +76,7 @@
 								<h3 class="panel-title">Verbos</h3>
 							</div>
 						
-							<div class="panel-body" style="max-height: 10;overflow-y: scroll;">
+							<div class="panel-body" style="max-height: 70em;overflow-y: scroll;">
 								<ul ng-repeat="word in words">
 									<li ng-if="word.type=='verb'">{{word.word}}</li>
 								</ul> 
@@ -89,7 +89,7 @@
 								<h3 class="panel-title">Otros</h3>		
 							</div>
 						
-							<div class="panel-body" style="max-height: 10;overflow-y: scroll;">
+							<div class="panel-body" style="max-height: 70em;overflow-y: scroll;">
 								<ul ng-repeat="word in words">
 									<li ng-if="word.type=='otro'">{{word.word}}</li>
 								</ul> 
@@ -351,7 +351,6 @@
 
 	signVideo.onended = function() {
 		if(wordsIndex < words.length) {
-			//signVideo.src = "http://signit.brazilsouth.cloudapp.azure.com/vids/"+words[wordsIndex]+".mp4";
 			signVideo.src = "vids/"+words[wordsIndex]+".mp4";
 			signVideo.load();
 			wordsIndex++;

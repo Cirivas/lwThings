@@ -71,6 +71,7 @@ def freelingParser(frobject):
 	flagDe = False 
 	flagSubject = False
 	flagNegative = False
+	flagTense = False
 	verb = ''
 	question = ''
 	pronoun = ''
@@ -88,6 +89,7 @@ def freelingParser(frobject):
 	pronouns2 = {'me':'a-mi', 'te':'a-ti', 'se':'se', 'nos':'a-nosotros', 'os':'a-vosotros', 'lo': 'eso', 'la': 'eso'}
 
 	tenses ={"I":"(imperfecto)", "F":"(futuro)","S":"(pasado)","C":"(condicional)"}
+	tensesWords = ["ayer", "anteayer", "mañana"]
 
 	#Convert stream object to list, so we can iterate freely through it
 	phrase = []
@@ -118,8 +120,9 @@ def freelingParser(frobject):
 			continue
 
 		elif line[1] == 'ser':
-			if line[2][3] != 'P':
+			if line[2][3] != 'P' and not flagTense:
 				final.insert(0, tenses[line[2][3]])
+				flagTense = True
 		
 			#if there is no pronoun in the sentense, add it from the verb
 			if not flagSubject and not (pronounsDict[line[2][4:6]] in final or 'ella' in final):
@@ -144,6 +147,13 @@ def freelingParser(frobject):
 		elif line[1] in '¿?.,':
 			flagArt = False
 			continue
+
+		elif line[1] in tensesWords:
+			if flagTense:
+				continue
+			else:
+				final.insert(0, line[1])
+				flagTense = True
 
 		elif flagArt and line[2][0] == 'V':
 			#if an article was removed, and the current word is a identified as a verb, it is really a noun, so we do not add the lemma.
@@ -173,8 +183,9 @@ def freelingParser(frobject):
 			
 			#identify pronoun and tense
 			#TODO: 2 verbal times
-			if line[2][3] != 'P':
+			if line[2][3] != 'P' and not flagTense:
 				final.insert(0, tenses[line[2][3]])
+				flagTense = True
 
 			#if there is no pronoun in the sentense, add it from the verb
 			if not flagSubject and not (pronounsDict[line[2][4:6]] in final or 'ella' in final):

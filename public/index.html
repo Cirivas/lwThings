@@ -281,7 +281,6 @@
 	    	for (var i = event.resultIndex; i < event.results.length; ++i) {
 	      		if (event.results[i].isFinal) {
 	        		final_transcript += event.results[i][0].transcript;
-	        		texto.innerHTML = final_transcript;
 	        		wordsAndLetters(event.results[i][0].transcript);
 	      		} else {
 	        		interim_transcript += event.results[i][0].transcript;
@@ -352,11 +351,22 @@
 	var words;
 	var wordsIndex = 0;
 	var videoEnded = true;
+	var textHTML = "";
+	texto.innerHTML = ""
+
 	//Generates the letters' array and show the first video
 	function generateWords(response){
 		words = response;
 		videoEnded = false;
 		wordsIndex = 0;
+		texto.innerHTML = "";
+		for(var i = 0, len = words.length; i < len; i++){
+			if(i == 0) 	textHTML += "<b><u>"+ words[i] + "</u></b> ";
+			else		textHTML += words[i] + " ";
+			
+		}
+		texto.innerHTML = textHTML;
+		textHTML = "";
 		signVideo.src = "vids/"+words[wordsIndex]+".mp4";
 		signVideo.load();
 		wordsIndex++;
@@ -364,6 +374,13 @@
 
 	signVideo.onended = function() {
 		if(wordsIndex < words.length) {
+			var arr = texto.innerHTML.split(" ");
+			for(var i = 0, len = arr.length; i < len; i++){
+				if(i == wordsIndex) 	textHTML += "<b><u>"+ arr[i] + "</u></b> ";
+				else		textHTML += arr[i] + " ";
+			}
+			texto.innerHTML = textHTML;
+			textHTML = "";
 			signVideo.src = "vids/"+words[wordsIndex]+".mp4";
 			signVideo.load();
 			wordsIndex++;
@@ -380,7 +397,7 @@
 				else words = words.concat(JSON.parse(this.response));
 			}
 		}
-		http.open('POST','http://signit.brazilsouth.cloudapp.azure.com/pet/', false);
+		http.open('POST','http://localhost:8080/pet/', false);
 		http.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 		http.send(params);		
 	}

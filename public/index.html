@@ -25,104 +25,115 @@
 				Demostración SignIt
 			</h1>
 		</div>
-		<div class="row">
-			<div class="col-md-offset-1 col-md-5">
-				<div id="info">
-				  <p id="info_start">Click en comenzar para iniciar la grabación.</p>
-				  <p id="info_speak_now">Escuchando...</p>
-				  <p id="info_no_speech">No se detectó habla <a href="//support.google.com/chrome/bin/answer.py?hl=en&amp;answer=1407892">Aqui</a></p>
-				  <p id="info_no_microphone" style="display:none"> No se encontró micrófono </p>
-				  <p id="info_allow">Click en "Permitir" para usar el micrófono.</p>
-				  <p id="info_denied">Permiso para utilizar el micrófono fue denegado.</p>
-				  <p id="info_blocked">El micrófono está bloqueado, puede cambiarlo en chrome://settings/contentExceptions#media-stream</p>
-				  <p id="info_upgrade">Web Speech API is not supported by this browser.
-				     Upgrade to <a href="//www.google.com/chrome">Chrome</a>
-				     version 25 or later.</p>
+		<div class="container">
+			
+			<div class="col-md-6">
+				<div class="row">
+					<div class="col-md-12">
+						<div id="info">
+						  <p id="info_start">Click en comenzar para iniciar la grabación.</p>
+						  <p id="info_speak_now">Escuchando...</p>
+						  <p id="info_no_speech">No se detectó habla <a href="//support.google.com/chrome/bin/answer.py?hl=en&amp;answer=1407892">Aqui</a></p>
+						  <p id="info_no_microphone" style="display:none"> No se encontró micrófono </p>
+						  <p id="info_allow">Click en "Permitir" para usar el micrófono.</p>
+						  <p id="info_denied">Permiso para utilizar el micrófono fue denegado.</p>
+						  <p id="info_blocked">El micrófono está bloqueado, puede cambiarlo en chrome://settings/contentExceptions#media-stream</p>
+						  <p id="info_upgrade">Web Speech API is not supported by this browser.
+						     Upgrade to <a href="//www.google.com/chrome">Chrome</a>
+						     version 25 or later.</p>
+						</div>
+						<div id="results">
+						  <span id="final_span" class="final"></span>
+						  <span id="interim_span" class="interim"></span>
+						  
+						</div>
+						<div class="center">
+							 <button id="start_button" onclick="startButton(event)">
+						    Comenzar</button>
+						  <div id="div_language">
+						    <select id="select_language" onchange="updateCountry()"></select>
+						    &nbsp;&nbsp;
+						    <select id="select_dialect"></select>
+						  </div>
+						</div>
+					</div>
 				</div>
-				<div id="results">
-				  <span id="final_span" class="final"></span>
-				  <span id="interim_span" class="interim"></span>
-				  <p>
-				</div>
-				<div class="center">
-					 <button id="start_button" onclick="startButton(event)">
-				    Comenzar</button>
-				  <div id="div_language">
-				    <select id="select_language" onchange="updateCountry()"></select>
-				    &nbsp;&nbsp;
-				    <select id="select_dialect"></select>
-				  </div>
+				<div class="row">
+					<div class="col-md-12">
+						<div class="center">
+							<div id="texto"></div>
+						</div>
+						<div class="center">
+							<video style="z-index:1" id="signVideo" preload="auto" autoplay></video>
+						</div>
+					</div>
 				</div>
 			</div>
-			<div class="col-md-5" ng-app="signit" ng-controller="WordCtrl">
-				<h2 class="center">Listado de Palabras disponibles</h2>
-				<div class="row" ng-controller="WordCtrl">
-					<div class="col-md-4">
-						<div class="panel panel-default">
-							<div class="panel-heading">
-								<h3 class="panel-title">Sustantivos</h3>
-							</div>
-							<div class="panel-body" style="max-height: 15em;overflow-y: scroll;">
-								<ul ng-repeat="word in words">
-									<li ng-if="word.type=='sust'">{{word.word}}</li>
-								</ul> 					
-							</div>
-						</div>
-					</div>
-					
-					<div class="col-md-4">
-						<div class="panel panel-default">
-							<div class="panel-heading">
-								<h3 class="panel-title">Verbos</h3>
-							</div>
-						
-							<div class="panel-body" style="max-height: 15em;overflow-y: scroll;">
-								<ul ng-repeat="word in words">
-									<li ng-if="word.type=='verb'">{{word.word}}</li>
-								</ul> 
-							</div>
-						</div>
-					</div>
-					<div class="col-md-4">
-						<div class="panel panel-default">
-							<div class="panel-heading">
-								<h3 class="panel-title">Otros</h3>		
-							</div>
-						
-							<div class="panel-body" style="max-height: 15em;overflow-y: scroll;">
-								<ul ng-repeat="word in words">
-									<li ng-if="word.type=='otro'">{{word.word}}</li>
-								</ul> 
-							</div>
-						</div>
-					</div>
-				</div>				
-			</div>
-		</div>
-		<div class="row">
-			<div class="col-md-offset-1 col-md-5">
-				<div class="center">
-					<div id="texto"></div>
-				</div>
-				<div class="center">
-				
 
-					<video style="z-index:1" id="signVideo" preload="auto" autoplay></video>
+			<div class="col-md-6">
+				<div class="row">
+					<div class="col-md-12">
+						<h2 class="center">Listado de Palabras disponibles</h2>
+						<div class="row" ng-app="signit" ng-controller="WordCtrl">
+							<div class="col-md-4">
+								<div class="panel panel-default">
+									<div class="panel-heading">
+										<h3 class="panel-title">Sustantivos</h3>
+									</div>
+									<div class="panel-body" style="max-height: 15em;overflow-y: scroll;">
+										<ul ng-repeat="word in words">
+											<li ng-if="word.type=='sust'">{{word.word}}</li>
+										</ul> 					
+									</div>
+								</div>
+							</div>
+							
+							<div class="col-md-4">
+								<div class="panel panel-default">
+									<div class="panel-heading">
+										<h3 class="panel-title">Verbos</h3>
+									</div>
+								
+									<div class="panel-body" style="max-height: 15em;overflow-y: scroll;">
+										<ul ng-repeat="word in words">
+											<li ng-if="word.type=='verb'">{{word.word}}</li>
+										</ul> 
+									</div>
+								</div>
+							</div>
+							<div class="col-md-4">
+								<div class="panel panel-default">
+									<div class="panel-heading">
+										<h3 class="panel-title">Otros</h3>		
+									</div>
+								
+									<div class="panel-body" style="max-height: 15em;overflow-y: scroll;">
+										<ul ng-repeat="word in words">
+											<li ng-if="word.type=='otro'">{{word.word}}</li>
+										</ul> 
+									</div>
+								</div>
+							</div>
+						</div>		
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-12">
+						<h2 class="center">Frases ejemplo</h2>
+						<ul>
+							<li>Mi idea es muy buena</li>
+							<li>El patio de mi hija es bonito</li>
+							<li>Ayer comí en casa</li>
+							<li>Quiero comer un helado</li>
+							<li>Quiero que sepas bailar</li>
+						</ul>
+					</div>
 				</div>
 			</div>
-			<div class="col-md-5">
-				<h2 class="center">Frases ejemplo</h2>
-				<ul>
-					<li>Mi idea es muy buena</li>
-					<li>El patio de mi hija es bonito</li>
-					<li>Ayer comí en casa</li>
-					<li>Quiero comer un helado</li>
-					<li>Quiero que sepas bailar</li>
-				</ul>
-			</div>
+			
 		</div>
 		<div class="row">
-			<div class="col-md-offset-1 col-md-6">
+			<div class="center">
 				Videos utilizados de las fuentes: <a href="http://diccionariodesenas.umce.cl/">Diccionario de Señas Chileno</a> y <a href="https://www.signingsavvy.com">Siging Savvy</a>
 			</div>
 		</div>

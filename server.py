@@ -76,7 +76,7 @@ def freelingParser(frobject):
 	pronoun = ''
 	pronoun2 = ''
 
-	questionMarks = ['qué', 'cómo', 'cuál', 'cuáles', 'cuánto', 'cuántos']
+	questionMarks = ['qué', 'cómo', 'cuál', 'cuáles', 'cuánto', 'cuántos', 'dónde', 'cuándo']
 	femenineWords = ['ella', 'esposa', 'tía', 'prima', 'hermana', 'cuñada', 'nuera', 'niña', 'hija']
 	possessives = ['mi', 'tu', 'su', 'nuestro', 'nuestra', 'vuestro', 'vuestra', 'sus']
 

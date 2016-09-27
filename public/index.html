@@ -19,7 +19,7 @@
 		<script src="bower_components/angular-resource/angular-resource.js"></script>
 		<script src="js/ctrl/wordctrl.js"></script>
 	</head>
-	<body>
+	<body >
 		<div class="row">
 			<h1 class="center" id="headline">
 				Demostración SignIt
@@ -48,18 +48,24 @@
 						  
 						</div>
 						<div class="center">
-							 <button id="start_button" onclick="startButton(event)">
+							 <button id="start_button" class="btn btn-primary" onclick="startButton(event)">
 						    Comenzar</button>
-						  <div id="div_language">
+						    <br>
+						  <!--<div id="div_language">
 						    <select id="select_language" onchange="updateCountry()"></select>
 						    &nbsp;&nbsp;
 						    <select id="select_dialect"></select>
-						  </div>
+						  </div>-->
 						</div>
 					</div>
 				</div>
 				<div class="row">
 					<div class="col-md-12">
+						<div class="row">
+							<div class="center">
+								<h3>Video resultado</h3>
+							</div>
+						</div>
 						<div class="center">
 							<div id="texto"></div>
 						</div>
@@ -73,10 +79,11 @@
 			<div class="col-md-6">
 				<div class="row">
 					<div class="col-md-12">
-						<h2 class="center">Listado de Palabras disponibles</h2>
+						<h3 class="center">Listado de Palabras disponibles</h3>
 						<div class="row" ng-app="signit" ng-controller="WordCtrl">
+
 							<div class="col-md-4">
-								<div class="panel panel-default">
+								<div class="panel panel-primary">
 									<div class="panel-heading">
 										<h3 class="panel-title">Sustantivos</h3>
 									</div>
@@ -89,7 +96,7 @@
 							</div>
 							
 							<div class="col-md-4">
-								<div class="panel panel-default">
+								<div class="panel panel-primary">
 									<div class="panel-heading">
 										<h3 class="panel-title">Verbos</h3>
 									</div>
@@ -102,7 +109,7 @@
 								</div>
 							</div>
 							<div class="col-md-4">
-								<div class="panel panel-default">
+								<div class="panel panel-primary">
 									<div class="panel-heading">
 										<h3 class="panel-title">Otros</h3>		
 									</div>
@@ -129,8 +136,7 @@
 						</ul>
 					</div>
 				</div>
-			</div>
-			
+			</div>	
 		</div>
 		<div class="row">
 			<div class="center">
@@ -203,13 +209,13 @@
 	                     ['yue-Hant-HK', '粵語 (香港)']],
 	 ['日本語',           ['ja-JP']],
 	 ['Lingua latīna',   ['la']]];
-	for (var i = 0; i < langs.length; i++) {
+	/*for (var i = 0; i < langs.length; i++) {
 		select_language.options[i] = new Option(langs[i][0], i);
 	}
 	select_language.selectedIndex = 7;
 	updateCountry();
 	select_dialect.selectedIndex = 2;
-	showInfo('info_start');
+	
 	function updateCountry() {
 		for (var i = select_dialect.options.length - 1; i >= 0; i--) {
 	    	select_dialect.remove(i);
@@ -219,7 +225,8 @@
 			select_dialect.options.add(new Option(list[i][1], list[i][0]));
 		}
 	  	select_dialect.style.visibility = list[1].length == 1 ? 'hidden' : 'visible';
-	}
+	}*/
+	showInfo('info_start');
 	var create_email = false;
 	var final_transcript = '';
 	var recognizing = false;
@@ -257,6 +264,7 @@
 	  	recognition.onend = function() {
 	    	recognizing = false;
 	    	start_button.innerHTML = "Comenzar";
+	    	start_button.className = "btn btn-primary";
 	    	if (ignore_onend) {
 	      		return;
 	    	}
@@ -284,7 +292,6 @@
 
 	        		//Call server
 	        		signVideo.poster = "loading01.gif";
-	        		signVideo.load();
 	        		wordsAndLetters(event.results[i][0].transcript);
 	      		} else {
 	        		interim_transcript += event.results[i][0].transcript;
@@ -320,12 +327,13 @@
 	  	}
 	  	wordsIndex = 0;
 	  	final_transcript = '';
-	  	recognition.lang = select_dialect.value;
+	  	recognition.lang = langs[7][2];
 	  	recognition.start();
 	  	ignore_onend = false;
 	  	final_span.innerHTML = '';
 	  	interim_span.innerHTML = '';
 	  	start_button.innerHTML = "Detener";
+	  	start_button.className = "btn btn-danger"
 	  	showInfo('info_allow');
 	  	showButtons('none');
 	  	start_timestamp = event.timeStamp;	 
@@ -357,8 +365,6 @@
 	var videoEnded = true;
 	var textHTML = "";
 	texto.innerHTML = "";
-	signVideo.defaultPlaybackRate = 1.2;
-
 	//Generates the letters' array and show the first video
 	function generateWords(response){
 		words = response;
@@ -380,9 +386,13 @@
 	signVideo.onended = function() {
 		if(wordsIndex < words.length) {
 			var arr = texto.innerHTML.split(" ");
-			for(var i = 0, len = arr.length; i < len; i++){
-				if(i == wordsIndex) 	textHTML += "<b><u>"+ arr[i] + "</u></b> ";
-				else		textHTML += arr[i] + " ";
+			var filtered = arr.filter(function(element){
+				return element != "";
+			});
+
+			for(var i = 0, len = filtered.length; i < len; i++){
+				if(i == wordsIndex) 	textHTML += "<b><u>"+ filtered[i] + "</u></b> ";
+				else		textHTML += filtered[i] + " ";
 			}
 			texto.innerHTML = textHTML;
 			textHTML = "";
@@ -403,13 +413,14 @@
 					var temp = words.length;
 					words = words.concat(JSON.parse(this.response));
 					for(var i = temp, len = words.length; i < len; i++){
+						if(words[i] == "") continue;
 						texto.innerHTML += words[i] + " ";
 					}
-					//texto.innerHTML += textHTML;
 				}
 			}
 		}
-		http.open('POST','http://signit.brazilsouth.cloudapp.azure.com/pet/', false);
+		//http.open('POST','http://signit.brazilsouth.cloudapp.azure.com/pet/', true);
+		http.open('POST','http://localhost:8080/pet', true);
 		http.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 		http.send(params);		
 	}

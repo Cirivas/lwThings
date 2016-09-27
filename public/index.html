@@ -281,6 +281,10 @@
 	    	for (var i = event.resultIndex; i < event.results.length; ++i) {
 	      		if (event.results[i].isFinal) {
 	        		final_transcript += event.results[i][0].transcript;
+
+	        		//Call server
+	        		signVideo.poster = "loading01.gif";
+	        		signVideo.load();
 	        		wordsAndLetters(event.results[i][0].transcript);
 	      		} else {
 	        		interim_transcript += event.results[i][0].transcript;
@@ -352,7 +356,8 @@
 	var wordsIndex = 0;
 	var videoEnded = true;
 	var textHTML = "";
-	texto.innerHTML = ""
+	texto.innerHTML = "";
+	signVideo.defaultPlaybackRate = 1.2;
 
 	//Generates the letters' array and show the first video
 	function generateWords(response){

@@ -86,7 +86,7 @@ def freelingParser(frobject):
 	pronounsDict = { "1S": "yo", "2S": "tú", "3S": "él",
 					 "1P": "nosotros", "2P": "ustedes", "3P": "ellos"}
 
-	pronouns2 = {'me':'a-mi', 'te':'a-ti', 'se':'se', 'nos':'a-nosotros', 'os':'a-vosotros', 'lo': 'eso', 'la': 'eso'}
+	pronouns2 = {'me':'ami', 'te':'ati', 'se':'se', 'nos':'anosotros', 'os':'avosotros', 'lo': 'eso', 'la': 'eso'}
 
 	tenses ={"I":"(imperfecto)", "F":"(futuro)","S":"(pasado)","C":"(condicional)"}
 	tensesWords = ["ayer", "anteayer", "mañana"]
@@ -178,9 +178,9 @@ def freelingParser(frobject):
 				else:
 					flagSubject = False
 
-			elif line[2][2] not in ['N', 'P', 'G'] :
+			elif line[2][2] in ['I', 'S'] :
 				
-				#the verb is not in infinitive, participe or gerund
+				#the verb is not in infinitive, participe, gerund or imperative
 				#store verb to put it at the end
 				#if there is already a verb, put it in the array since it is not the main verb.
 				if verb != '':
@@ -226,8 +226,20 @@ def freelingParser(frobject):
 				if not flagTense:
 					final.insert(0, '(pasado)')
 					flagTense = True
+			
+			elif line[2][2] == 'M':
+				#Imperative verbs
+				if verb != '':
+					final.append(verb)
+				verb = line[1]		
 
-			elif line[2][2] == 'N':
+				#if there is no pronoun in the sentense, add it from the verb
+				if not flagSubject and not (pronounsDict[line[2][4:6]] in final or 'ella' in final):
+					final.insert(0,pronounsDict[line[2][4:6]])
+				else:
+					flagSubject = False	
+
+			else:
 				#Infinitive verbs are just part of the speech, they are not the main verb.
 				final.append(line[1])
 			
@@ -245,13 +257,24 @@ def freelingParser(frobject):
 			
 			sub = line[2][2] + line[2][4]
 			index = phrase.index(line)
-			if phrase[index-1][2][0] == 'V' and phrase[index-1][2][2] == 'N':
-				##'Pronombre enclítico' add it in front of the verb
-				final.insert(index-1, pronouns2[line[1]])
+			indfinal = len(final)
+			if phrase[index-1][2][0] == 'V':
+				##'Pronombre enclítico'
+				if phrase[index-1][2][2] == 'N':
+					#after an infitive, we insert it
+					final.insert(indfinal-1, pronouns2[line[1]])
+				else:
+					#after an imperative, we append it
+					final.append(pronouns2[line[1]])
 				
-			elif phrase[index-2][2][0] == 'V' and phrase[index-2][2][2] == 'N' and phrase[index-1][0] == 'se':
-				##cases: selo, sela, sele, selos, selas, seles	
-				final.insert(index-2, pronouns2[line[1]])
+			elif phrase[index-2][2][0] == 'V':
+				#cases: telo, melo, selo, etc etc
+				if phrase[index-1][2][2] == 'N':
+					#after an infitive, we insert it
+					final.insert(indfinal-2, pronouns2[line[1]])
+				else:
+					#after an imperative, we append it
+					final.append(pronouns2[line[1]])
 
 			elif phrase[index+1][2][0] == 'V' and phrase[index+1][2][4:6] == sub:
 				#It is actually a reflexive, we can add a pronoun from it

@@ -394,7 +394,14 @@
 		http.onreadystatechange = function(){
 			if(this.readyState == 4 && this.status == 200) {
 				if(videoEnded) generateWords(JSON.parse(this.response));
-				else words = words.concat(JSON.parse(this.response));
+				else {
+					var temp = words.length;
+					words = words.concat(JSON.parse(this.response));
+					for(var i = temp, len = words.length; i < len; i++){
+						texto.innerHTML += words[i] + " ";
+					}
+					//texto.innerHTML += textHTML;
+				}
 			}
 		}
 		http.open('POST','http://localhost:8080/pet/', false);

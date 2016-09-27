@@ -67,7 +67,6 @@ def freelingParser(frobject):
 	final = []
 
 	#this variable helps to identify a participe verb used as a noun (el helado), so we do not add the lemma (helar).
-	flagArt = False
 	flagDe = False 
 	flagSubject = False
 	flagNegative = False
@@ -81,6 +80,7 @@ def freelingParser(frobject):
 	femenineWords = ['ella', 'esposa', 'tía', 'prima', 'hermana', 'cuñada', 'nuera', 'niña', 'hija']
 	possessives = ['mi', 'tu', 'su', 'nuestro', 'nuestra', 'vuestro', 'vuestra', 'sus']
 
+	articles = ['el', 'un', 'uno']
 	
 	pronouns = ["yo", "tú", "usted", "él","ella", "nosotros", "vosotros", "ustedes", "ellos", "ellas"]
 	pronounsDict = { "1S": "yo", "2S": "tú", "3S": "él",
@@ -111,8 +111,7 @@ def freelingParser(frobject):
 		
 		if len(line) < 2:
 			continue
-		elif line[1] in ['el', 'un', 'uno']:
-			flagArt = True
+		elif line[1] in articles:
 			continue
 
 		elif line[1] == 'no':
@@ -130,10 +129,10 @@ def freelingParser(frobject):
 			else:				
 				flagSubject = False
 
-			flagArt = False		
+					
 
 		elif line[1] == 'que':
-			flagArt = False
+			
 			#If 'que' goes after a verb, we add the stored verb, since it is not the main verb.
 			if verb != '':
 				final.append(verb)
@@ -145,7 +144,7 @@ def freelingParser(frobject):
 			
 			
 		elif line[1] in '¿?.,':
-			flagArt = False
+			
 			continue
 
 		elif line[1] in tensesWords:
@@ -153,45 +152,85 @@ def freelingParser(frobject):
 				continue
 			else:
 				final.insert(0, line[1])
-				flagTense = True
-
-		elif flagArt and line[2][0] == 'V':
-			#if an article was removed, and the current word is a identified as a verb, it is really a noun, so we do not add the lemma.
-			#e.g. 'el helado', 'el dado'.
-			final.append(line[0])
-			flagArt = False
+				flagTense = True			
 		
 		elif line[0] in questionMarks:
-			flagArt = False
+			
 			#store question word to put it at the end
 			question = line[0]
 
 		elif line[0] in femenineWords:
-			flagArt = False
+			
 			#Words like "ella", "esposa" have a masculine lema, but we need to keep it in femenine
 			final.append(line[0])
 
-		elif line[2][0] == 'V' and line[2][2] != 'N':
-			flagArt = False
-			#store verb to put it at the end
-			#if there is already a verb, put it in the array since it is not the main verb.
-			if verb != '':
-				final.append(verb)
-			
-			
-			verb = line[1]
-			
-			#identify pronoun and tense
-			#TODO: 2 verbal times
-			if line[2][3] != 'P' and not flagTense:
-				final.insert(0, tenses[line[2][3]])
-				flagTense = True
+		elif line[2][0] == 'V':
+			if line[2][1] == 'A':
+				#Auxiliary verbs (estar + gerundio, haber + participio) are not added.
+				#They give information about the tense and subject.
 
-			#if there is no pronoun in the sentense, add it from the verb
-			if not flagSubject and not (pronounsDict[line[2][4:6]] in final or 'ella' in final):
-				final.append(pronounsDict[line[2][4:6]])
-			else:
-				flagSubject = False
+				if line[2][3] != 'P' and not flagTense:
+					final.insert(0, tenses[line[2][3]])
+					flagTense = True
+
+				if not flagSubject and not (pronounsDict[line[2][4:6]] in final or 'ella' in final):
+					final.append(pronounsDict[line[2][4:6]])
+				else:
+					flagSubject = False
+
+			elif line[2][2] not in ['N', 'P', 'G'] :
+				
+				#the verb is not in infinitive, participe or gerund
+				#store verb to put it at the end
+				#if there is already a verb, put it in the array since it is not the main verb.
+				if verb != '':
+					final.append(verb)
+				
+				
+				verb = line[1]
+				
+				#identify pronoun and tense
+				#TODO: 2 verbal times
+				if line[2][3] != 'P' and not flagTense:
+					final.insert(0, tenses[line[2][3]])
+					flagTense = True
+
+				#if there is no pronoun in the sentense, add it from the verb
+				if not flagSubject and not (pronounsDict[line[2][4:6]] in final or 'ella' in final):
+					final.append(pronounsDict[line[2][4:6]])
+				else:
+					flagSubject = False
+
+			#A verb in gerund or participe comes after an auxiliary verb.					
+			elif line[2][2] == 'G':
+				#Since the auxiliary verb is not added in any way, we just store the verb and put in the end (if it nost the main verb)
+				if verb != '':
+					final.append(verb)
+
+				verb = line[1]				
+
+			elif line[2][2] == 'P':
+				#if an article was removed, and the current word is a identified as a verb, it is really a noun, so we do not add the lemma.
+				#e.g. 'el helado', 'el dado'.
+				index = phrase.index(line)
+				if phrase[index-1][1] in articles:
+					final.append(line[0])
+					continue
+				
+				if verb != '':
+					final.append(verb)
+
+				verb = line[1]
+
+				#If the verb is in participe and there is no tense added, we add the past tense.
+				if not flagTense:
+					final.insert(0, '(pasado)')
+					flagTense = True
+
+			elif line[2][2] == 'N':
+				#Infinitive verbs are just part of the speech, they are not the main verb.
+				final.append(line[1])
+			
 		
 		elif line[1] == 'de':
 			flagDe = True
@@ -203,7 +242,7 @@ def freelingParser(frobject):
 		
 		##Check if the pronoun if a reflexive or a complement
 		elif line[1] in pronouns2.keys():
-			flagArt = False
+			
 			sub = line[2][2] + line[2][4]
 			index = phrase.index(line)
 			if phrase[index-1][2][0] == 'V' and phrase[index-1][2][2] == 'N':
@@ -230,9 +269,11 @@ def freelingParser(frobject):
 				pronoun2 = line[1]
 		
 		else:
-			if flagArt:
-				flagSubject = True
-			flagArt = False
+			index = phrase.index(line)
+			if index > 0:
+				if phrase[index-1][1] in articles:
+					flagSubject = True
+			
 			final.append(line[1])
 		
 	#Add pronoun2 pronoun, verb and question mark (if any)

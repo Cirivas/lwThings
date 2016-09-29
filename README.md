@@ -16,12 +16,15 @@ El resto de las dependencias se instala sin problemas utilizando ```npm install`
 
 ### AnguarJS
 
-Se incluye la siguiente directiva en el index: ```<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.js"></script>```
+Se incluye la siguiente directiva en el index: 
+```<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.js"></script>```
 
 Además, se utiliza la librería "Angular-resource", para instalar, se utiliza bower:
 
-```npm install -g bower```
-```bower install angular-resource```
+```
+npm install -g bower
+bower install angular-resource
+```
 
 Asegurarse de mover la carpeta ```bower_components``` dentro de la carpeta public.
 

@@ -89,7 +89,8 @@
 							<div id="texto"></div>
 						</div>
 						<div class="center">
-							<video style="z-index:1" id="signVideo" preload="auto" autoplay></video>
+							<video style="z-index:1" id="signVideo" preload="auto"></video>
+							<video style="z-index:1" id="signVideo2" preload="auto"></video>
 						</div>
 					</div>
 				</div>
@@ -379,31 +380,47 @@
 
 	// video related
 	//Video vars
-	var words;
-	var wordsIndex = 0;
+	var resp;
+	var words = new Array();
+	var words2 = new Array();
+	var wordsIndex = 0; //Global
+	var wordsIndex1 = 0;
+	var wordsIndex2 = 0;
 	var videoEnded = true;
 	var textHTML = "";
 	texto.innerHTML = "";
 	//Generates the letters' array and show the first video
 	function generateWords(response){
-		words = response;
+		resp = response;
 		videoEnded = false;
 		wordsIndex = 0;
+		wordsIndex1 = 0;
+		wordsIndex2 = 0;
+		words = new Array();
+		words2 = new Array();
 		texto.innerHTML = "";
-		for(var i = 0, len = words.length; i < len; i++){
-			if(i == 0) 	textHTML += "<b><u>"+ words[i] + "</u></b> ";
-			else		textHTML += words[i] + " ";
+		for(var i = 0, len = response.length; i < len; i++){
+			if(i == 0) 	textHTML += "<b><u>"+ response[i] + "</u></b> ";
+			else		textHTML += response[i] + " ";
+
+			if(i % 2 == 0) words.push(response[i]);
+			else words2.push(response[i]);
 			
 		}
 		texto.innerHTML = textHTML;
 		textHTML = "";
-		signVideo.src = "vids/"+words[wordsIndex]+".mp4";
-		signVideo.load();
+		signVideo.src = "vids/"+words[wordsIndex1]+".mp4";
+		if(resp.length > 1) signVideo2.src = "vids/"+words2[wordsIndex2]+".mp4"
+		signVideo2.className = "hidden";
+		signVideo.className = "";
+		signVideo.play();
 		wordsIndex++;
+		wordsIndex1++;
+		wordsIndex2++;
 	}
 
 	signVideo.onended = function() {
-		if(wordsIndex < words.length) {
+		if(wordsIndex1 < words.length) {
 			var arr = texto.innerHTML.split(" ");
 			var filtered = arr.filter(function(element){
 				return element != "";
@@ -413,12 +430,71 @@
 				if(i == wordsIndex) 	textHTML += "<b><u>"+ filtered[i] + "</u></b> ";
 				else		textHTML += filtered[i] + " ";
 			}
+			signVideo.className = "hidden";
 			texto.innerHTML = textHTML;
 			textHTML = "";
-			signVideo.src = "vids/"+words[wordsIndex]+".mp4";
-			signVideo.load();
+			signVideo.src = "vids/"+words[wordsIndex1]+".mp4";
+			if(resp.length > 1) { 
+				signVideo2.className = "";
+				signVideo2.play();
+			}
 			wordsIndex++;
-		} else videoEnded = true;
+			wordsIndex1++;
+			return;
+		} else if(resp.length % 2 == 0) {
+			var arr = texto.innerHTML.split(" ");
+			var filtered = arr.filter(function(element){
+				return element != "";
+			});
+			for(var i = 0, len = filtered.length; i < len; i++){
+				if(i == wordsIndex) 	textHTML += "<b><u>"+ filtered[i] + "</u></b> ";
+				else		textHTML += filtered[i] + " ";
+			}
+			signVideo.className = "hidden";
+			signVideo2.className = "";
+			texto.innerHTML = textHTML;
+			textHTML = "";
+			signVideo2.play();
+			videoEnded = true;
+		}
+	}
+
+	signVideo2.onended = function() {
+		if(wordsIndex2 < words2.length) {
+			var arr = texto.innerHTML.split(" ");
+			var filtered = arr.filter(function(element){
+				return element != "";
+			});
+
+			for(var i = 0, len = filtered.length; i < len; i++){
+				if(i == wordsIndex) 	textHTML += "<b><u>"+ filtered[i] + "</u></b> ";
+				else		textHTML += filtered[i] + " ";
+			}
+			signVideo2.className = "hidden";
+			signVideo.className = "";
+			texto.innerHTML = textHTML;
+			textHTML = "";
+			signVideo2.src = "vids/"+words2[wordsIndex2]+".mp4";
+			signVideo.play();
+			wordsIndex++;
+			wordsIndex2++;
+			return;
+		} else if(resp.length % 2 != 0) {
+			var arr = texto.innerHTML.split(" ");
+			var filtered = arr.filter(function(element){
+				return element != "";
+			});
+			for(var i = 0, len = filtered.length; i < len; i++){
+				if(i == wordsIndex) 	textHTML += "<b><u>"+ filtered[i] + "</u></b> ";
+				else		textHTML += filtered[i] + " ";
+			}
+			signVideo2.className = "hidden";
+			signVideo.className = "";
+			texto.innerHTML = textHTML;
+			textHTML = "";
+			signVideo.play();
+			videoEnded = true;
+		}
 	}
 
 	//Get the words or to spell.
@@ -429,17 +505,19 @@
 			if(this.readyState == 4 && this.status == 200) {
 				if(videoEnded) generateWords(JSON.parse(this.response));
 				else {
-					var temp = words.length;
-					words = words.concat(JSON.parse(this.response));
-					for(var i = temp, len = words.length; i < len; i++){
-						if(words[i] == "") continue;
-						texto.innerHTML += words[i] + " ";
+					var temp = resp.length;
+					resp = resp.concat(JSON.parse(this.response));
+					for(var i = temp, len = resp.length; i < len; i++){
+						if(resp[i] == "") continue;
+						texto.innerHTML += resp[i] + " ";
+						if(i % 2 == 0) words.push(resp[i]);
+						else words2.push(resp[i]);
 					}
 				}
 			}
 		}
-		http.open('POST','http://signit.brazilsouth.cloudapp.azure.com/pet/', true);
-		//http.open('POST','http://localhost:8080/pet', true);
+		//http.open('POST','http://signit.brazilsouth.cloudapp.azure.com/pet/', true);
+		http.open('POST','http://localhost:8080/pet', true);
 		http.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 		http.send(params);		
 	}

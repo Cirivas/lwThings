@@ -1,3 +1,4 @@
+#!/usr/bin/python -p
 # -*- coding: utf-8 -*-
 import zerorpc
 import os

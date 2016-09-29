@@ -111,8 +111,8 @@ El comando ```enable``` solo es necesario ejecutarlo una vez.
 
 ## Links de Interés:
 
-- [Diccionario de Señas A-H (http://portales.mineduc.cl/usuarios/edu.especial/File/2012/DiccionarioSeNasAH.pdf)]
-- [Diccionario de Señas I-Z: (http://portales.mineduc.cl/usuarios/edu.especial/File/2012/DiccionarioSenasIZ.pdf)]
-- [Diccionario de Señas Videos (http://diccionariodesenas.umce.cl/)]
-- [Introducción pequeña a LSCh (https://issuu.com/fundacionamoma/docs/introducci__n_a_la_lengua_de_se__as)]
-- [Introducción a la gramática LS España (http://blog.showleap.com/tag/gramatica/)]
+- Diccionario de Señas A-H: http://portales.mineduc.cl/usuarios/edu.especial/File/2012/DiccionarioSeNasAH.pdf
+- Diccionario de Señas I-Z: http://portales.mineduc.cl/usuarios/edu.especial/File/2012/DiccionarioSenasIZ.pdf
+- Diccionario de Señas Videos http://diccionariodesenas.umce.cl/
+- Introducción pequeña a LSCh https://issuu.com/fundacionamoma/docs/introducci__n_a_la_lengua_de_se__as
+- Introducción a la gramática LS España http://blog.showleap.com/tag/gramatica/

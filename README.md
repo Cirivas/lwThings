@@ -14,6 +14,18 @@ https://github.com/JustinTulloss/zeromq.node
 
 El resto de las dependencias se instala sin problemas utilizando ```npm install``` en la carpeta base (donde está package.json)
 
+### AnguarJS
+
+Se incluye la siguiente directiva en el index: ```<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.js"></script>```
+
+Además, se utiliza la librería "Angular-resource", para instalar, se utiliza bower:
+
+```npm install -g bower```
+```bower install angular-resource```
+
+Asegurarse de mover la carpeta ```bower_components``` dentro de la carpeta public.
+
+
 ## Freeling
 download: https://github.com/TALP-UPC/FreeLing/releases
 

@@ -147,6 +147,14 @@
 				<div class="row">
 					<div class="col-md-12">
 						<h2 class="center">Frases ejemplo</h2>
+						<h3>Un solo intérprete</h3>
+						<ul>
+							<li>Tengo un abanico hermoso</li>
+							<li>Quiero un helado</li>
+							<li>¿Dónde comemos?</li>
+							<li>Sé jugar lotería</li>
+						</ul>
+						<h3>Más de un intérprete</h3>
 						<ul>
 							<li>Mi idea es muy buena</li>
 							<li>El patio de mi hija es bonito</li>
@@ -516,8 +524,8 @@
 				}
 			}
 		}
-		http.open('POST','http://signit.brazilsouth.cloudapp.azure.com/pet/', true);
-		//http.open('POST','http://localhost:8080/pet', true);
+		//http.open('POST','http://signit.brazilsouth.cloudapp.azure.com/pet/', true);
+		http.open('POST','http://localhost:8080/pet', true);
 		http.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 		http.send(params);		
 	}

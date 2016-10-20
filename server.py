@@ -69,7 +69,7 @@ def freelingParser(frobject):
 
 	#this variable helps to identify a participe verb used as a noun (el helado), so we do not add the lemma (helar).
 	flagDe = False 
-	flagSubject = False
+	flagSubject = True ##CHANGE LATER
 	flagNegative = False
 	flagTense = False
 	verb = ''
